@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header-css}">
+    <title>Đặt vé thành công - Smart Cinema</title>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: navbar}"></div>
+
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-sm text-center">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="mb-0 py-2">Đặt vé thành công!</h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <p class="lead">Cảm ơn bạn đã đặt vé tại Smart Cinema.</p>
+                        <p>Mã đặt vé của bạn là: <strong th:text="${booking.id}">#BOOKING123</strong></p>
+                        <p>Tổng số tiền: <strong th:text="${#numbers.formatDecimal(booking.totalAmount, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}">150,000 VNĐ</strong></p>
+                        <p>Thời gian đặt: <span th:text="${#temporals.format(booking.bookingTime, 'HH:mm dd/MM/yyyy')}"></span></p>
+
+                        <h5 class="mt-4">Chi tiết vé:</h5>
+                        <ul class="list-group list-group-flush mb-4">
+                            <li class="list-group-item" th:each="ticket : ${booking.tickets}">
+                                Phim: <strong th:text="${ticket.showtime.movie.title}"></strong> -
+                                Suất chiếu: <span th:text="${#temporals.format(ticket.showtime.startTime, 'HH:mm dd/MM/yyyy')}"></span> -
+                                Phòng: <span th:text="${ticket.showtime.room.name}"></span> -
+                                Ghế: <strong th:text="${ticket.seat.seatName}"></strong>
+                            </li>
+                        </ul>
+
+                        <a th:href="@{/booking/history}" class="btn btn-primary me-2">Xem lịch sử đặt vé</a>
+                        <a th:href="@{/}" class="btn btn-outline-secondary">Về trang chủ</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{home :: footer}"></footer>
+</body>
+</html>
