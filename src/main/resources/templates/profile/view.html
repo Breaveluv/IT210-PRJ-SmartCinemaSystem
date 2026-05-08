@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header-css}">
+    <title>Hồ sơ cá nhân - Smart Cinema</title>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: navbar}"></div>
+
+    <div class="container mt-4">
+        <h2 class="mb-4">Hồ sơ cá nhân</h2>
+
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Thông tin tài khoản</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4 text-muted">Tên đăng nhập:</div>
+                    <div class="col-md-8" th:text="${user.username}"></div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 text-muted">Email:</div>
+                    <div class="col-md-8" th:text="${user.email}"></div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 text-muted">Họ và tên:</div>
+                    <div class="col-md-8" th:text="${user.fullName}"></div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 text-muted">Số điện thoại:</div>
+                    <div class="col-md-8" th:text="${user.phone}"></div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 text-muted">Vai trò:</div>
+                    <div class="col-md-8" th:text="${user.role}"></div>
+                </div>
+                <hr>
+                <a th:href="@{/profile/edit}" class="btn btn-primary">Chỉnh sửa hồ sơ</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

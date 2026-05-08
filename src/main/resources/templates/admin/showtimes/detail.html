@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Showtime Detail - Cinema Booking</title>
+
+    <style>
+        .detail-container {
+            display:grid;
+            grid-template-columns:1fr 300px;
+            gap:25px;
+        }
+
+        .main-content {
+            background:#111827;
+            border-radius:16px;
+            padding:25px;
+            border:1px solid rgba(255,255,255,0.06);
+        }
+
+        .sidebar-content {
+            background:#111827;
+            border-radius:16px;
+            padding:20px;
+            border:1px solid rgba(255,255,255,0.06);
+            height:fit-content;
+        }
+
+        .showtime-header {
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-start;
+            margin-bottom:25px;
+            padding-bottom:20px;
+            border-bottom:1px solid rgba(255,255,255,0.06);
+        }
+
+        .showtime-title h2 {
+            color:white;
+            margin:0;
+            font-weight:700;
+        }
+
+        .showtime-title p {
+            color:#94a3b8;
+            margin:5px 0 0;
+        }
+
+        .status-badge {
+            padding:10px 16px;
+            border-radius:20px;
+            font-size:12px;
+            font-weight:600;
+        }
+
+        .status-upcoming {
+            background:rgba(34,197,94,0.2);
+            color:#22c55e;
+        }
+
+        .status-ongoing {
+            background:rgba(59,130,246,0.2);
+            color:#3b82f6;
+        }
+
+        .status-passed {
+            background:rgba(107,114,128,0.2);
+            color:#6b7280;
+        }
+
+        .info-section {
+            margin-bottom:25px;
+        }
+
+        .info-section h4 {
+            color:white;
+            margin:0 0 15px;
+            font-weight:600;
+        }
+
+        .info-grid {
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+            gap:15px;
+        }
+
+        .info-item {
+            background:rgba(255,255,255,0.02);
+            padding:15px;
+            border-radius:12px;
+            border:1px solid rgba(255,255,255,0.04);
+        }
+
+        .info-label {
+            color:#94a3b8;
+            font-size:12px;
+            margin-bottom:5px;
+        }
+
+        .info-value {
+            color:white;
+            font-weight:600;
+            font-size:14px;
+        }
+
+        .movie-info {
+            display:flex;
+            gap:15px;
+            margin-bottom:20px;
+        }
+
+        .movie-poster {
+            width:80px;
+            height:110px;
+            border-radius:12px;
+            object-fit:cover;
+            background:#1e293b;
+        }
+
+        .movie-details h5 {
+            color:white;
+            margin:0 0 5px;
+            font-weight:600;
+        }
+
+        .movie-details p {
+            color:#94a3b8;
+            font-size:12px;
+            margin:2px 0;
+        }
+
+        .seats-section {
+            background:rgba(255,255,255,0.02);
+            padding:20px;
+            border-radius:12px;
+            border:1px solid rgba(255,255,255,0.04);
+        }
+
+        .seats-grid {
+            display:grid;
+            grid-template-columns:repeat(auto-fill,minmax(40px,1fr));
+            gap:8px;
+            margin-top:15px;
+        }
+
+        .seat-item {
+            width:35px;
+            height:35px;
+            border-radius:6px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:11px;
+            font-weight:600;
+            cursor:pointer;
+            transition:0.3s;
+        }
+
+        .seat-available {
+            background:#22c55e;
+            color:white;
+        }
+
+        .seat-booked {
+            background:#ef4444;
+            color:white;
+        }
+
+        .seat-selected {
+            background:#3b82f6;
+            color:white;
+        }
+
+        .seat-disabled {
+            background:#6b7280;
+            color:#9ca3af;
+        }
+
+        .stats-section {
+            background:rgba(255,255,255,0.02);
+            padding:20px;
+            border-radius:12px;
+            border:1px solid rgba(255,255,255,0.04);
+        }
+
+        .stats-grid {
+            display:grid;
+            grid-template-columns:repeat(2,1fr);
+            gap:15px;
+        }
+
+        .stat-item {
+            text-align:center;
+        }
+
+        .stat-number {
+            color:white;
+            font-size:24px;
+            font-weight:700;
+            margin-bottom:5px;
+        }
+
+        .stat-label {
+            color:#94a3b8;
+            font-size:12px;
+        }
+
+        .action-buttons {
+            display:flex;
+            gap:10px;
+            margin-top:20px;
+        }
+
+        .action-btn {
+            padding:12px 20px;
+            border:none;
+            border-radius:12px;
+            color:white;
+            cursor:pointer;
+            font-weight:600;
+            text-decoration:none;
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            transition:0.3s;
+            flex:1;
+            justify-content:center;
+        }
+
+        .btn-edit {
+            background:#8b5cf6;
+        }
+
+        .btn-edit:hover {
+            background:#7c3aed;
+        }
+
+        .btn-delete {
+            background:#ef4444;
+        }
+
+        .btn-delete:hover {
+            background:#dc2626;
+        }
+
+        .btn-back {
+            background:#6b7280;
+        }
+
+        .btn-back:hover {
+            background:#4b5563;
+        }
+
+        .bookings-list {
+            margin-top:20px;
+        }
+
+        .booking-item {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:12px;
+            background:rgba(255,255,255,0.02);
+            border-radius:8px;
+            margin-bottom:8px;
+            border:1px solid rgba(255,255,255,0.04);
+        }
+
+        .booking-info h6 {
+            color:white;
+            margin:0;
+            font-size:14px;
+        }
+
+        .booking-info p {
+            color:#94a3b8;
+            margin:2px 0 0;
+            font-size:12px;
+        }
+
+        .booking-seats {
+            display:flex;
+            gap:5px;
+        }
+
+        .booking-seat {
+            background:#3b82f6;
+            color:white;
+            padding:2px 6px;
+            border-radius:4px;
+            font-size:10px;
+            font-weight:600;
+        }
+    </style>
+</head>
+
+<body>
+
+<div layout:fragment="content">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-white fw-bold mb-0">Chi tiết Suất chiếu</h2>
+            <p class="text-muted mb-0 mt-2">CORE-08: Quản lý trạng thái suất chiếu và tình hình đặt vé</p>
+        </div>
+
+        <a href="#" class="btn btn-secondary fw-bold d-inline-flex align-items-center gap-2">
+            <i class="fa-solid fa-arrow-left"></i>
+            Quay lại
+        </a>
+    </div>
+
+    <!-- DETAIL CONTAINER -->
+    <div class="detail-container">
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+
+            <!-- SHOWTIME HEADER -->
+            <div class="showtime-header">
+
+                <div class="showtime-title">
+                    <h2 class="text-white fw-bold mb-0" th:text="|Suất chiếu #${showtime.id}|">Suất chiếu #12345</h2>
+                    <p class="text-muted mb-0 mt-1" th:text="|${#temporals.format(showtime.startTime, 'dd/MM/yyyy HH:mm')}|">01/05/2026 14:00</p>
+                </div>
+
+                <!-- STATUS BADGE -->
+                <span th:if="${T(java.time.LocalDateTime).now().isAfter(showtime.endTime)}"
+                      class="badge rounded-pill status-badge status-passed">Đã kết thúc</span>
+
+                <span th:if="${T(java.time.LocalDateTime).now().isAfter(showtime.startTime) and T(java.time.LocalDateTime).now().isBefore(showtime.endTime)}"
+                      class="badge rounded-pill status-badge status-ongoing">Đang chiếu</span>
+
+                <span th:if="${T(java.time.LocalDateTime).now().isBefore(showtime.startTime)}"
+                      class="badge rounded-pill status-badge status-upcoming">Sắp tới</span>
+
+            </div>
+
+            <!-- MOVIE INFO -->
+            <div class="info-section">
+                <h4 class="text-white fw-bold mb-3">Thông tin phim</h4>
+
+                <div class="movie-info">
+                    <img th:src="${showtime.movie.posterUrl ?: 'https://via.placeholder.com/80x110'}"
+                         class="movie-poster"
+                         th:alt="${showtime.movie.title}">
+
+                    <div class="movie-details">
+                        <h5 class="text-white fw-bold mb-1" th:text="${showtime.movie.title}">Movie Title</h5>
+                        <p class="text-muted fs-6 mb-1" th:text="|Thể loại: ${showtime.movie.genre.name}|">Thể loại: Action</p>
+                        <p class="text-muted fs-6 mb-1" th:text="|Thời lượng: ${showtime.movie.duration} phút|">Thời lượng: 120 phút</p>
+                        <p class="text-muted fs-6 mb-0" th:text="|Giá vé: ${#numbers.formatDecimal(showtime.price,1,0)} đ|">Giá vé: 100,000 đ</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SHOWTIME INFO -->
+            <div class="info-section">
+                <h4 class="text-white fw-bold mb-3">Thông tin suất chiếu</h4>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Phòng chiếu</div>
+                        <div class="info-value" th:text="${showtime.room.name}">Phòng 1</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Ngày chiếu</div>
+                        <div class="info-value" th:text="${#temporals.format(showtime.startTime, 'dd/MM/yyyy')}">01/05/2026</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Giờ bắt đầu</div>
+                        <div class="info-value" th:text="${#temporals.format(showtime.startTime, 'HH:mm')}">14:00</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Giờ kết thúc</div>
+                        <div class="info-value" th:text="${#temporals.format(showtime.endTime, 'HH:mm')}">16:00</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEATS LAYOUT (CORE-08) -->
+            <div class="info-section">
+                <h4 class="text-white fw-bold mb-3">Sơ đồ ghế ngồi</h4>
+
+                <div class="seats-section">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted">Tình trạng ghế (Tổng: <span th:text="${showtime.room.totalSeats}">100</span> ghế)</span>
+                        <div class="d-flex gap-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="seat-item seat-available" style="width:20px; height:20px;"></div>
+                                <span class="text-muted fs-6">Còn trống</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="seat-item seat-booked" style="width:20px; height:20px;"></div>
+                                <span class="text-muted fs-6">Đã đặt</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="seats-grid">
+                        <!-- Mock seats data - in real app, this would come from showtime.seats -->
+                        <div th:each="i : ${#numbers.sequence(1, showtime.room.totalSeats)}"
+                             class="seat-item seat-available"
+                             th:text="${i}">1</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOOKINGS LIST -->
+            <div class="info-section">
+                <h4 class="text-white fw-bold mb-3">Danh sách đặt vé</h4>
+
+                <div class="bookings-list">
+                    <div th:if="${showtime.bookings.size() > 0}" th:each="booking : ${showtime.bookings}" class="booking-item">
+                        <div class="booking-info">
+                            <h6 class="text-white mb-0" th:text="${booking.user.username}">Username</h6>
+                            <p class="text-muted mb-0" th:text="${#temporals.format(booking.createdAt, 'dd/MM/yyyy HH:mm')}">01/05/2026 14:30</p>
+                        </div>
+
+                        <div class="booking-seats">
+                            <span th:each="seat : ${booking.bookingSeats}" class="booking-seat" th:text="${seat.seat.seatNumber}">A1</span>
+                        </div>
+                    </div>
+
+                    <div th:if="${showtime.bookings.size() == 0}" class="text-center text-muted py-3">
+                        <i class="fa-solid fa-ticket fs-2 d-block mb-2"></i>
+                        <p>Chưa có booking nào</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- SIDEBAR -->
+        <div class="sidebar-content">
+
+            <!-- SEATS STATISTICS -->
+            <div class="info-section">
+                <h4 class="text-white fw-bold mb-3">Thống kê ghế</h4>
+
+                <div class="stats-section">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number text-success" th:text="${showtime.room.totalSeats - (showtime.bookings.size() * 3)}">80</div>
+                            <div class="stat-label">Ghế trống</div>
+                        </div>
+
+                        <div class="stat-item">
+                            <div class="stat-number text-danger" th:text="${showtime.bookings.size() * 3}">20</div>
+                            <div class="stat-label">Ghế đã đặt</div>
+                        </div>
+
+                        <div class="stat-item">
+                            <div class="stat-number text-info" th:text="${showtime.bookings.size()}">5</div>
+                            <div class="stat-label">Booking</div>
+                        </div>
+
+                        <div class="stat-item">
+                            <div class="stat-number text-warning" th:text="|${#numbers.formatDecimal((showtime.bookings.size() * 3 * 100.0) / showtime.room.totalSeats,1,1)}%|">20%</div>
+                            <div class="stat-label">Tỷ lệ lấp đầy</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REVENUE INFO -->
+            <div class="info-section">
+                <h4 class="text-white fw-bold mb-3">Doanh thu</h4>
+
+                <div class="stats-section">
+                    <div class="text-center">
+                        <div class="stat-number text-success mb-2" th:text="|${#numbers.formatDecimal(showtime.bookings.size() * showtime.price * 3,1,0)} đ|">1,500,000 đ</div>
+                        <div class="stat-label">Tổng doanh thu</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="action-buttons">
+                <a href="#" class="action-btn btn-back">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Quay lại
+                </a>
+
+                <a href="#" class="action-btn btn-edit">
+                    <i class="fa-solid fa-pen"></i>
+                    Sửa suất chiếu
+                </a>
+
+                <button type="button" class="action-btn btn-delete" onclick="deleteShowtime()">
+                    <i class="fa-solid fa-trash"></i>
+                    Xóa suất chiếu
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    function deleteShowtime() {
+        if (confirm('Bạn có chắc chắn muốn xóa suất chiếu này? Tất cả booking sẽ bị hủy.')) {
+            // TODO: Implement API call
+            console.log('Delete showtime');
+        }
+    }
+</script>
+
+</body>
+</html>

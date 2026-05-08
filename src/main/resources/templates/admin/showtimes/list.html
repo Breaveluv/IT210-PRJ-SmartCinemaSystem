@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Showtimes Management - Cinema Booking</title>
+
+    <style>
+        .showtime-card {
+            background:#111827;
+            border-radius:16px;
+            padding:20px;
+            border:1px solid rgba(255,255,255,0.06);
+            margin-bottom:15px;
+            transition:0.3s;
+        }
+
+        .showtime-card:hover {
+            border-color:rgba(255,255,255,0.12);
+            background:#1a2332;
+        }
+
+        .showtime-header {
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-start;
+            margin-bottom:15px;
+            padding-bottom:15px;
+            border-bottom:1px solid rgba(255,255,255,0.06);
+        }
+
+        .showtime-title {
+            display:flex;
+            gap:15px;
+            flex:1;
+        }
+
+        .movie-poster-small {
+            width:70px;
+            height:90px;
+            border-radius:8px;
+            object-fit:cover;
+            background:#1e293b;
+        }
+
+        .showtime-info h5 {
+            color:white;
+            margin:0;
+            font-weight:600;
+        }
+
+        .showtime-info p {
+            color:#94a3b8;
+            font-size:12px;
+            margin:3px 0;
+        }
+
+        .status-badge {
+            padding:8px 12px;
+            border-radius:16px;
+            font-size:11px;
+            font-weight:600;
+        }
+
+        .status-upcoming {
+            background:rgba(34,197,94,0.2);
+            color:#22c55e;
+        }
+
+        .status-soon-full {
+            background:rgba(249,115,22,0.2);
+            color:#f97316;
+        }
+
+        .status-full {
+            background:rgba(59,130,246,0.2);
+            color:#3b82f6;
+        }
+
+        .status-passed {
+            background:rgba(107,114,128,0.2);
+            color:#6b7280;
+        }
+
+        .showtime-details {
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+            gap:15px;
+            margin-bottom:15px;
+        }
+
+        .detail-item {
+            display:flex;
+            flex-direction:column;
+        }
+
+        .detail-label {
+            color:#94a3b8;
+            font-size:11px;
+            margin-bottom:3px;
+        }
+
+        .detail-value {
+            color:white;
+            font-weight:600;
+            font-size:13px;
+        }
+
+        .seats-status {
+            display:flex;
+            align-items:center;
+            gap:15px;
+            background:rgba(255,255,255,0.02);
+            padding:12px;
+            border-radius:8px;
+            margin-bottom:15px;
+        }
+
+        .seats-bar {
+            height:8px;
+            background:rgba(255,255,255,0.1);
+            border-radius:4px;
+            flex:1;
+            overflow:hidden;
+        }
+
+        .seats-filled {
+            height:100%;
+            background:linear-gradient(90deg,#ff3d6e,#ff6b81);
+        }
+
+        .seats-text {
+            color:#cbd5e1;
+            font-size:12px;
+            font-weight:600;
+            white-space:nowrap;
+        }
+
+        .action-buttons {
+            display:flex;
+            gap:8px;
+        }
+
+        .action-btn {
+            padding:8px 12px;
+            border:none;
+            border-radius:8px;
+            color:white;
+            cursor:pointer;
+            font-size:12px;
+            font-weight:600;
+            text-decoration:none;
+            display:inline-flex;
+            align-items:center;
+            gap:5px;
+            transition:0.3s;
+        }
+
+        .btn-view {
+            background:#3b82f6;
+        }
+
+        .btn-view:hover {
+            background:#2563eb;
+        }
+
+        .btn-edit {
+            background:#8b5cf6;
+        }
+
+        .btn-edit:hover {
+            background:#7c3aed;
+        }
+
+        .btn-delete {
+            background:#ef4444;
+        }
+
+        .btn-delete:hover {
+            background:#dc2626;
+        }
+
+        .section-header {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:25px;
+        }
+
+        .stats-row {
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+            gap:15px;
+            margin-bottom:25px;
+        }
+
+        .stat-card {
+            background:#111827;
+            border-radius:16px;
+            padding:15px;
+            border:1px solid rgba(255,255,255,0.06);
+            text-align:center;
+        }
+
+        .stat-card h3 {
+            color:white;
+            margin:0;
+            font-size:24px;
+            font-weight:700;
+        }
+
+        .stat-card p {
+            color:#94a3b8;
+            font-size:12px;
+            margin:5px 0 0;
+        }
+
+        .filter-box {
+            background:#111827;
+            border-radius:16px;
+            padding:15px;
+            border:1px solid rgba(255,255,255,0.06);
+            margin-bottom:20px;
+            display:flex;
+            gap:10px;
+            flex-wrap:wrap;
+        }
+
+        .filter-item select {
+            background:#1e293b;
+            border:1px solid rgba(255,255,255,0.06);
+            color:white;
+            padding:8px 12px;
+            border-radius:8px;
+            cursor:pointer;
+        }
+
+        .empty-state {
+            text-align:center;
+            padding:40px;
+            color:#94a3b8;
+        }
+
+        .empty-state i {
+            font-size:32px;
+            display:block;
+            margin-bottom:15px;
+        }
+
+        .timeline-indicator {
+            display:flex;
+            gap:5px;
+            align-items:center;
+        }
+
+        .time-dot {
+            width:8px;
+            height:8px;
+            border-radius:50%;
+            background:#22c55e;
+        }
+
+        .time-dot.passed {
+            background:#6b7280;
+        }
+
+        <stylesheet>
+    </style>
+</head>
+
+<body>
+
+<div layout:fragment="content">
+
+    <!-- HEADER -->
+    <div class="section-header">
+        <div>
+            <h2 style="color:white; margin:0; font-weight:700;">Quản lý Suất chiếu</h2>
+            <p style="color:#94a3b8; margin:5px 0 0;">CORE-08: Theo dõi trạng thái suất chiếu (Upcoming, Sold Out, Passed)</p>
+        </div>
+
+        <a href="#" style="background:linear-gradient(135deg,#ff3d6e,#ff6b81); border:none; color:white; padding:12px 22px; border-radius:12px; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-plus"></i>
+            Tạo suất chiếu mới
+        </a>
+    </div>
+
+    <!-- STATISTICS -->
+    <div class="stats-row">
+
+        <div class="stat-card">
+            <h3 th:text="${showtimes.size()}">0</h3>
+            <p>Tổng suất chiếu</p>
+        </div>
+
+        <div class="stat-card">
+            <h3 th:text="${showtimes.stream().filter(s -> T(java.time.LocalDateTime).now().isBefore(s.startTime)).count()}">0</h3>
+            <p>Sắp tới</p>
+        </div>
+
+        <div class="stat-card">
+            <h3 th:text="${showtimes.stream().filter(s -> T(java.time.LocalDateTime).now().isAfter(s.startTime)).count()}">0</h3>
+            <p>Đã kết thúc</p>
+        </div>
+
+    </div>
+
+    <!-- FILTER -->
+    <div class="filter-box">
+
+        <div class="filter-item">
+            <select id="statusFilter">
+                <option value="">Tất cả trạng thái</option>
+                <option value="upcoming">Sắp tới</option>
+                <option value="soon-full">Sắp hết</option>
+                <option value="full">Hết vé</option>
+                <option value="passed">Đã kết thúc</option>
+            </select>
+        </div>
+
+        <div class="filter-item">
+            <select id="roomFilter">
+                <option value="">Tất cả phòng</option>
+                <option value="1">Phòng 1</option>
+                <option value="2">Phòng 2</option>
+                <option value="3">Phòng 3</option>
+            </select>
+        </div>
+
+        <button style="background:linear-gradient(135deg,#ff3d6e,#ff6b81); border:none; color:white; padding:8px 14px; border-radius:8px; cursor:pointer; font-weight:600;">
+            <i class="fa-solid fa-search"></i> Tìm kiếm
+        </button>
+
+    </div>
+
+    <!-- SHOWTIMES LIST -->
+    <div th:if="${showtimes.size() > 0}">
+
+        <div th:each="showtime : ${showtimes}" class="showtime-card"
+             th:classappend="${T(java.time.LocalDateTime).now().isAfter(showtime.startTime) ? 'passed' : 'upcoming'}">
+
+            <!-- HEADER -->
+            <div class="showtime-header">
+
+                <div class="showtime-title">
+
+                    <img th:src="${showtime.movie.posterUrl ?: 'https://via.placeholder.com/70x90'}"
+                         class="movie-poster-small"
+                         th:alt="${showtime.movie.title}">
+
+                    <div class="showtime-info">
+                        <h5 th:text="${showtime.movie.title}">Movie Title</h5>
+                        <p th:text="|Phòng: ${showtime.room.name}|">Phòng: 1</p>
+                        <p th:text="|${showtime.movie.duration} phút|">120 phút</p>
+                    </div>
+
+                </div>
+
+                <!-- STATUS BADGE -->
+                <span th:if="${T(java.time.LocalDateTime).now().isAfter(showtime.startTime)}"
+                      class="status-badge status-passed">Đã kết thúc</span>
+
+                <span th:if="${T(java.time.LocalDateTime).now().isBefore(showtime.startTime)}"
+                      class="status-badge status-upcoming">Sắp tới</span>
+
+            </div>
+
+            <!-- DETAILS -->
+            <div class="showtime-details">
+
+                <div class="detail-item">
+                    <span class="detail-label">Ngày chiếu</span>
+                    <span class="detail-value" th:text="${#temporals.format(showtime.startTime, 'dd/MM/yyyy')}">01/05/2026</span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Giờ bắt đầu</span>
+                    <span class="detail-value" th:text="${#temporals.format(showtime.startTime, 'HH:mm')}">14:00</span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Giờ kết thúc</span>
+                    <span class="detail-value" th:text="${#temporals.format(showtime.endTime, 'HH:mm')}">15:45</span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Giá vé</span>
+                    <span class="detail-value" th:text="|${#numbers.formatDecimal(showtime.price,1,2)} đ|">100,000 đ</span>
+                </div>
+
+            </div>
+
+            <!-- SEATS STATUS (CORE-08) -->
+            <div class="seats-status">
+
+                <div style="flex:1;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                        <span style="color:#94a3b8; font-size:12px;">Tình trạng ghế</span>
+                        <span style="color:white; font-size:12px; font-weight:600; color:#22c55e;" th:text="|${showtime.room.totalSeats}/100 ghế còn|">80/100 ghế</span>
+                    </div>
+                    <div class="seats-bar">
+                        <div class="seats-filled" style="width:80%;"></div>
+                    </div>
+                </div>
+
+                <span class="seats-text">80%</span>
+
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="action-buttons">
+
+                <a th:href="@{/admin/showtimes/{id}(id=${showtime.id})}"
+                   class="action-btn btn-view">
+                    <i class="fa-solid fa-eye"></i>
+                    Chi tiết
+                </a>
+
+                <a href="#"
+                   th:onclick="|editShowtime(${showtime.id})|"
+                   class="action-btn btn-edit">
+                    <i class="fa-solid fa-pen"></i>
+                    Sửa
+                </a>
+
+                <button type="button"
+                        th:onclick="|deleteShowtime(${showtime.id})|"
+                        class="action-btn btn-delete">
+                    <i class="fa-solid fa-trash"></i>
+                    Xóa
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div th:if="${showtimes.size() == 0}" class="empty-state">
+        <i class="fa-solid fa-inbox"></i>
+        <p>Không có suất chiếu nào</p>
+    </div>
+
+</div>
+
+<!-- Scripts -->
+<script>
+    function editShowtime(showtimeId) {
+        console.log('Edit showtime:', showtimeId);
+        // TODO: Implement edit functionality
+    }
+
+    function deleteShowtime(showtimeId) {
+        if (confirm('Bạn có chắc chắn muốn xóa suất chiếu này?')) {
+            console.log('Delete showtime:', showtimeId);
+            // TODO: Implement API call
+        }
+    }
+
+    document.getElementById('statusFilter').addEventListener('change', function() {
+        console.log('Filter by status:', this.value);
+        // TODO: Implement filtering
+    });
+
+    document.getElementById('roomFilter').addEventListener('change', function() {
+        console.log('Filter by room:', this.value);
+        // TODO: Implement filtering
+    });
+</script>
+
+</body>
+</html>
+

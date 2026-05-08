@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${showtime.id == null ? 'Thêm Suất chiếu mới' : 'Chỉnh sửa Suất chiếu'}"></title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="my-4 text-center" th:text="${showtime.id == null ? 'Thêm Suất chiếu mới' : 'Chỉnh sửa Suất chiếu'}"></h1>
+
+        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+            <span th:text="${errorMessage}"></span>
+        </div>
+        <div th:if="${successMessage}" class="alert alert-success" role="alert">
+            <span th:text="${successMessage}"></span>
+        </div>
+
+        <form th:action="@{/admin/showtimes/save}" th:object="${showtime}" method="post">
+            <input type="hidden" th:field="*{id}" />
+
+            <div class="form-group">
+                <label for="movie">Phim:</label>
+                <select id="movie" th:field="*{movie.id}" class="form-control" required>
+                    <option value="">-- Chọn Phim --</option>
+                    <option th:each="movie : ${movies}"
+                            th:value="${movie.id}"
+                            th:text="${movie.title}"
+                            th:selected="${showtime.movie != null and showtime.movie.id == movie.id}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="room">Phòng:</label>
+                <select id="room" th:field="*{room.id}" class="form-control" required>
+                    <option value="">-- Chọn Phòng --</option>
+                    <option th:each="room : ${rooms}"
+                            th:value="${room.id}"
+                            th:text="${room.name}"
+                            th:selected="${showtime.room != null and showtime.room.id == room.id}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="startTime">Thời gian bắt đầu:</label>
+                <input type="datetime-local" id="startTime" th:field="*{startTime}" class="form-control" required />
+            </div>
+
+            <div class="form-group">
+                <label for="price">Giá vé:</label>
+                <input type="number" id="price" th:field="*{price}" class="form-control" step="0.01" min="0" required />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Lưu Suất chiếu</button>
+            <a th:href="@{/admin/showtimes}" class="btn btn-secondary">Hủy</a>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

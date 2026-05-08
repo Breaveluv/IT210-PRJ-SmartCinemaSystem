@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header-css}">
+    <title>Chỉnh sửa hồ sơ - Smart Cinema</title>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: navbar}"></div>
+
+    <div class="container mt-4">
+        <h2 class="mb-4">Chỉnh sửa hồ sơ cá nhân</h2>
+
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Cập nhật thông tin</h5>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/profile/update}" th:object="${user}" method="post">
+                    <input type="hidden" th:field="*{id}">
+                    <input type="hidden" th:field="*{username}">
+                    <input type="hidden" th:field="*{password}">
+                    <input type="hidden" th:field="*{role}">
+
+                    <div class="mb-3">
+                        <label for="fullName" class="form-label">Họ và tên</label>
+                        <input type="text" th:field="*{fullName}" id="fullName" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" th:field="*{email}" id="email" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Số điện thoại</label>
+                        <input type="text" th:field="*{phone}" id="phone" class="form-control">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    <a th:href="@{/profile}" class="btn btn-secondary">Hủy</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
