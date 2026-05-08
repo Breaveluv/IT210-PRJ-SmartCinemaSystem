@@ -2,17 +2,25 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: header-css}">
     <title>Smart Cinema</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+    </style>
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
     <div th:replace="~{fragments/header :: navbar}"></div>
 
-    <div class="container mt-4">
+    <div class="container mt-4 flex-grow-1">
         <div th:replace="${content}">
             <!-- Content of each page will be injected here -->
         </div>
     </div>
 
-    <footer class="text-center bg-dark text-white py-4 mt-5">
+    <footer class="text-center bg-dark text-white py-4 mt-auto">
         <div class="container">
             <p class="mb-0">&copy; 2023 Smart Cinema Booking System. All rights reserved.</p>
         </div>

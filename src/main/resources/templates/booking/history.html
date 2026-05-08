@@ -1,62 +1,128 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/header :: header-css}">
-    <title>Lịch sử đặt vé - Smart Cinema</title>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch sử đặt vé</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            margin-bottom: 20px;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+        .seat-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: inline;
+        }
+        .seat-list li {
+            display: inline;
+            margin-right: 5px;
+        }
+        .seat-list li:not(:last-child):after {
+            content: ",";
+        }
+    </style>
 </head>
 <body>
-    <div th:replace="~{fragments/header :: navbar}"></div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="/">Smart Cinema</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Trang Chủ</a>
+                </li>
+                <li class="nav-item" th:if="${session.loggedInUser == null}">
+                    <a class="nav-link" href="/login">Đăng Nhập</a>
+                </li>
+                <li class="nav-item" th:if="${session.loggedInUser == null}">
+                    <a class="nav-link" href="/register">Đăng Ký</a>
+                </li>
+                <li class="nav-item dropdown" th:if="${session.loggedInUser != null}">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Xin chào, <span th:text="${session.loggedInUser.username}"></span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/profile">Hồ sơ</a>
+                        <a class="dropdown-item" href="/booking/history">Lịch sử đặt vé</a>
+                        <a class="dropdown-item" th:if="${session.loggedInUser != null and session.loggedInUser.role == T(com.example.smartcinemabookingsystem.model.User$Role).ADMIN}" href="/admin/dashboard">Admin Dashboard</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/logout">Đăng xuất</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
 
-    <div class="container mt-4">
-        <h2 class="mb-4">Lịch sử đặt vé của bạn</h2>
-        <div class="table-responsive">
-            <table class="table table-hover shadow-sm">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Mã đơn</th>
-                        <th>Thời gian đặt</th>
-                        <th>Thông tin phim & Suất chiếu</th>
-                        <th>Ghế</th>
-                        <th>Tổng tiền</th>
-                        <th>Trạng thái</th>
-                        <th>Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="booking : ${bookings}">
-                        <td th:text="${'#' + booking.id}">#1</td>
-                        <td th:text="${#temporals.format(booking.bookingTime, 'HH:mm dd/MM/yyyy')}"></td>
-                        <td>
-                            <div th:each="ticket, iterStat : ${booking.tickets}" th:if="${iterStat.first}">
-                                <strong th:text="${ticket.showtime.movie.title}"></strong><br>
-                                <span class="small text-muted" th:text="${#temporals.format(ticket.showtime.startTime, 'HH:mm dd/MM/yyyy')}"></span>
-                                <span class="small text-muted" th:text="${' - ' + ticket.showtime.room.name}"></span>
-                            </div>
-                        </td>
-                        <td>
-                            <span th:each="ticket, iterStat : ${booking.tickets}"
-                                  th:text="${ticket.seat.seatName} + ${!iterStat.last ? ', ' : ''}"
-                                  class="badge bg-info text-dark"></span>
-                        </td>
-                        <td th:text="${#numbers.formatDecimal(booking.totalAmount, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"></td>
-                        <td>
-                            <span th:classappend="${booking.status.name() == 'CONFIRMED' ? 'bg-success' : (booking.status.name() == 'CANCELLED' ? 'bg-danger' : 'bg-warning')}"
-                                  class="badge" th:text="${booking.status}"></span>
-                        </td>
-                        <td>
-                            <a th:href="@{'/booking/cancel/' + ${booking.id}}"
-                               class="btn btn-sm btn-outline-danger"
-                               onclick="return confirm('Bạn có chắc chắn muốn hủy vé này?')"
-                               th:if="${booking.status.name() == 'CONFIRMED'}">Hủy vé</a>
-                        </td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(bookings)}">
-                        <td colspan="7" class="text-center py-4">Bạn chưa có lịch sử đặt vé nào.</td>
-                    </tr>
-                </tbody>
-            </table>
+    <div class="container">
+        <h1 class="my-4 text-center">Lịch sử đặt vé của bạn</h1>
+
+        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+            <span th:text="${errorMessage}"></span>
+        </div>
+        <div th:if="${successMessage}" class="alert alert-success" role="alert">
+            <span th:text="${successMessage}"></span>
+        </div>
+
+        <div th:if="${bookings.isEmpty()}" class="alert alert-info text-center" role="alert">
+            Bạn chưa có đơn đặt vé nào.
+        </div>
+
+        <div th:each="booking : ${bookings}" class="card shadow-sm mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    Mã đặt vé: <span th:text="${booking.bookingId}"></span>
+                    <span class="badge badge-pill"
+                          th:classappend="${booking.bookingStatus == 'CONFIRMED' ? 'badge-success' : (booking.bookingStatus == 'CANCELLED' ? 'badge-danger' : 'badge-warning')}"
+                          th:text="${booking.bookingStatus}"></span>
+                </div>
+                <div th:if="${booking.bookingStatus == 'CONFIRMED'}">
+                    <a th:href="@{/booking/cancel/{bookingId}(bookingId=${booking.bookingId})}" class="btn btn-sm btn-warning">Hủy vé</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <img th:src="${booking.moviePosterUrl}" class="img-fluid rounded" alt="Movie Poster">
+                    </div>
+                    <div class="col-md-9">
+                        <h5 class="card-title" th:text="${booking.movieTitle}">Tên Phim</h5>
+                        <p class="card-text">
+                            <strong>Suất chiếu:</strong> <span th:text="${#temporals.format(booking.showtimeStartTime, 'dd-MM-yyyy HH:mm')}"></span><br>
+                            <strong>Phòng:</strong> <span th:text="${booking.roomName}"></span><br>
+                            <strong>Ghế đã chọn:</strong>
+                            <ul class="seat-list">
+                                <li th:each="seatName : ${booking.seatNames}" th:text="${seatName}"></li>
+                            </ul>
+                            <br>
+                            <strong>Tổng tiền:</strong> <span th:text="${#numbers.formatDecimal(booking.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span><br>
+                            <strong>Thời gian đặt:</strong> <span th:text="${#temporals.format(booking.bookingTime, 'dd-MM-yyyy HH:mm')}"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <footer th:replace="~{home :: footer}"></footer>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

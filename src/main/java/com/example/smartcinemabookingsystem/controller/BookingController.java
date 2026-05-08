@@ -1,5 +1,6 @@
 package com.example.smartcinemabookingsystem.controller;
 
+import com.example.smartcinemabookingsystem.exception.BookingConflictException;
 import com.example.smartcinemabookingsystem.model.Booking;
 import com.example.smartcinemabookingsystem.model.Seat;
 import com.example.smartcinemabookingsystem.model.Showtime;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +33,8 @@ public class BookingController {
     private final TicketRepository ticketRepository;
 
     @GetMapping("/{showtimeId}")
-    public String selectSeats(@PathVariable Long showtimeId, Model model, HttpSession session) {
+    public String selectSeats(@PathVariable Long showtimeId, Model model, HttpSession session,
+                              @RequestParam(value = "error", required = false) String error) {
         User user = (User) session.getAttribute("loggedInUser");
         if (user == null) {
             return "redirect:/login";
@@ -41,12 +44,22 @@ public class BookingController {
         if (showtime == null) return "redirect:/";
 
         List<Seat> seats = bookingService.getAvailableSeats(showtimeId);
+        // We no longer need to fetch bookedSeatIds here, as the JS will handle it
+        // and the service layer will do the final check.
+        // For display purposes, we might want to fetch actively booked seats.
         List<Long> bookedSeatIds = ticketRepository.findByShowtimeId(showtimeId)
-                .stream().map(t -> t.getSeat().getId()).collect(Collectors.toList());
+                .stream()
+                .filter(ticket -> ticket.getBooking().getStatus() != Booking.BookingStatus.CANCELLED)
+                .map(t -> t.getSeat().getId())
+                .collect(Collectors.toList());
+
 
         model.addAttribute("showtime", showtime);
         model.addAttribute("seats", seats);
         model.addAttribute("bookedSeatIds", bookedSeatIds);
+        if (error != null) {
+            model.addAttribute("errorMessage", error);
+        }
         
         return "booking/seat-selection";
     }
@@ -55,7 +68,7 @@ public class BookingController {
     public String confirmBooking(@RequestParam Long showtimeId, 
                                  @RequestParam String seatIds, 
                                  HttpSession session, 
-                                 Model model) {
+                                 RedirectAttributes redirectAttributes) {
         User user = (User) session.getAttribute("loggedInUser");
         if (user == null) return "redirect:/login";
 
@@ -65,12 +78,23 @@ public class BookingController {
                     .collect(Collectors.toList());
             
             Booking booking = bookingService.createBooking(user, showtimeId, seatIdList);
-            model.addAttribute("booking", booking);
-            return "booking/success";
+            redirectAttributes.addFlashAttribute("booking", booking);
+            return "redirect:/booking/success";
+        } catch (BookingConflictException e) {
+            redirectAttributes.addAttribute("error", e.getMessage());
+            return "redirect:/booking/" + showtimeId;
         } catch (Exception e) {
-            model.addAttribute("error", e.getMessage());
-            return "redirect:/booking/" + showtimeId + "?error";
+            redirectAttributes.addAttribute("error", "Đã xảy ra lỗi khi đặt vé: " + e.getMessage());
+            return "redirect:/booking/" + showtimeId;
         }
+    }
+
+    @GetMapping("/success")
+    public String bookingSuccess(Model model) {
+        if (!model.containsAttribute("booking")) {
+            return "redirect:/"; // Redirect if no booking object is present (e.g., direct access)
+        }
+        return "booking/success";
     }
 
     @GetMapping("/history")
@@ -78,7 +102,25 @@ public class BookingController {
         User user = (User) session.getAttribute("loggedInUser");
         if (user == null) return "redirect:/login";
 
-        model.addAttribute("bookings", bookingService.getBookingsByUser(user.getId()));
+        model.addAttribute("bookings", bookingService.getDetailedBookingHistoryForUser(user.getId()));
         return "booking/history";
+    }
+
+    @GetMapping("/cancel/{bookingId}")
+    public String cancelBooking(@PathVariable Long bookingId, HttpSession session, RedirectAttributes redirectAttributes) {
+        User user = (User) session.getAttribute("loggedInUser");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            bookingService.cancelBooking(bookingId, user.getId());
+            redirectAttributes.addFlashAttribute("successMessage", "Hủy vé thành công!");
+        } catch (SecurityException | IllegalStateException | IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Đã xảy ra lỗi khi hủy vé: " + e.getMessage());
+        }
+        return "redirect:/booking/history";
     }
 }

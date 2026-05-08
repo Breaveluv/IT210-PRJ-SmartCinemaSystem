@@ -31,8 +31,14 @@ public class AuthController {
                                Model model) {
         Optional<User> userOpt = userService.findByUsername(username);
         if (userOpt.isPresent() && userOpt.get().getPassword().equals(password)) {
-            session.setAttribute("loggedInUser", userOpt.get());
-            return "redirect:/";
+            User loggedInUser = userOpt.get();
+            session.setAttribute("loggedInUser", loggedInUser);
+            
+            if (loggedInUser.getRole() == User.Role.ADMIN) {
+                return "redirect:/admin/dashboard"; // Redirect Admin to admin dashboard
+            } else {
+                return "redirect:/"; // Redirect other users to home page
+            }
         }
         model.addAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng");
         return "login";

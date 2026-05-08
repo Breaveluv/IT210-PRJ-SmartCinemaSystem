@@ -11,4 +11,8 @@ import java.util.List;
 public interface ShowtimeRepository extends JpaRepository<Showtime, Long> {
     List<Showtime> findByMovieId(Long movieId);
     List<Showtime> findByRoomIdAndStartTimeBetween(Long roomId, LocalDateTime start, LocalDateTime end);
+    List<Showtime> findByRoomId(Long roomId); // Added for easier conflict checking
+
+    // New method for CORE-08: Find showtimes that have not yet started
+    List<Showtime> findByStartTimeAfter(LocalDateTime currentTime);
 }

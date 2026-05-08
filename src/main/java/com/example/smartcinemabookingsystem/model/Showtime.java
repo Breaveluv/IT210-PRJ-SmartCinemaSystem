@@ -32,4 +32,8 @@ public class Showtime {
     private LocalDateTime endTime;
 
     private double price;
+
+    // Trường mới để cho phép tùy chỉnh số ghế cho suất chiếu
+    // Sử dụng Integer để có thể là null nếu không muốn tùy chỉnh
+    private Integer customTotalSeats;
 }

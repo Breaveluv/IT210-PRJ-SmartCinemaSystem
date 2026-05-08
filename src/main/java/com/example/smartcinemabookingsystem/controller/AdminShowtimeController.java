@@ -1,5 +1,7 @@
 package com.example.smartcinemabookingsystem.controller;
 
+import com.example.smartcinemabookingsystem.exception.ShowtimeConflictException;
+import com.example.smartcinemabookingsystem.model.Movie;
 import com.example.smartcinemabookingsystem.model.Showtime;
 import com.example.smartcinemabookingsystem.service.MovieService;
 import com.example.smartcinemabookingsystem.service.RoomService;
@@ -22,29 +24,47 @@ public class AdminShowtimeController {
     @GetMapping
     public String listShowtimes(Model model) {
         model.addAttribute("showtimes", showtimeService.getAllShowtimes());
-        return "admin/showtimes/list";
+        return "admin/showtimes/list"; // Updated to use admin layout
     }
 
     @GetMapping("/new")
     public String newShowtimeForm(Model model) {
         model.addAttribute("showtime", new Showtime());
-        model.addAttribute("movies", movieService.getAllMovies()); // Need to get all movies, not paginated
+        model.addAttribute("movies", movieService.getAllMovies());
         model.addAttribute("rooms", roomService.getAllRooms());
-        return "admin/showtimes/form";
+        return "admin/showtimes/form"; // Updated to use admin layout
     }
 
     @PostMapping("/save")
     public String saveShowtime(@ModelAttribute Showtime showtime, RedirectAttributes redirectAttributes) {
         try {
             // Fetch Movie and Room objects as only IDs are passed from form
-            showtime.setMovie(movieService.getMovieById(showtime.getMovie().getId()));
-            showtime.setRoom(roomService.getRoomById(showtime.getRoom().getId()).orElse(null));
+            Movie movie = movieService.getMovieById(showtime.getMovie().getId())
+                                      .orElseThrow(() -> new IllegalArgumentException("Phim không tồn tại."));
+            showtime.setMovie(movie);
+            
+            showtime.setRoom(roomService.getRoomById(showtime.getRoom().getId())
+                                        .orElseThrow(() -> new IllegalArgumentException("Phòng chiếu không tồn tại.")));
 
             showtimeService.saveShowtime(showtime);
             redirectAttributes.addFlashAttribute("successMessage", "Suất chiếu đã được lưu thành công!");
-        } catch (RuntimeException e) {
+        } catch (ShowtimeConflictException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi xung đột: " + e.getMessage());
+            // Redirect back to the form with error message
+            if (showtime.getId() == null) {
+                return "redirect:/admin/showtimes/new";
+            } else {
+                return "redirect:/admin/showtimes/edit/" + showtime.getId();
+            }
+        } catch (IllegalArgumentException e) { // Catch specific IllegalArgumentException for not found movie/room
             redirectAttributes.addFlashAttribute("errorMessage", "Lỗi: " + e.getMessage());
-            // If it's a new showtime, redirect to new form, else to edit form
+            if (showtime.getId() == null) {
+                return "redirect:/admin/showtimes/new";
+            } else {
+                return "redirect:/admin/showtimes/edit/" + showtime.getId();
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi: " + e.getMessage());
             if (showtime.getId() == null) {
                 return "redirect:/admin/showtimes/new";
             } else {
@@ -58,9 +78,9 @@ public class AdminShowtimeController {
     public String editShowtimeForm(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         return showtimeService.getShowtimeById(id).map(showtime -> {
             model.addAttribute("showtime", showtime);
-            model.addAttribute("movies", movieService.getAllMovies()); // Need to get all movies, not paginated
+            model.addAttribute("movies", movieService.getAllMovies());
             model.addAttribute("rooms", roomService.getAllRooms());
-            return "admin/showtimes/form";
+            return "admin/showtimes/form"; // Updated to use admin layout
         }).orElseGet(() -> {
             redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy suất chiếu.");
             return "redirect:/admin/showtimes";
@@ -76,5 +96,12 @@ public class AdminShowtimeController {
             redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi xóa suất chiếu: " + e.getMessage());
         }
         return "redirect:/admin/showtimes";
+    }
+
+    @GetMapping("/{id}")
+    public String showtimeDetail(@PathVariable Long id, Model model) {
+        var showtime = showtimeService.getShowtimeById(id);
+        model.addAttribute("showtime", showtime);
+        return "admin/showtimes/detail";
     }
 }

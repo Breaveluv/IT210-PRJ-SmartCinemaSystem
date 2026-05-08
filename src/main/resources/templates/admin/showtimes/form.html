@@ -50,9 +50,17 @@
                     <option th:each="room : ${rooms}"
                             th:value="${room.id}"
                             th:text="${room.name}"
+                            th:data-total-seats="${room.totalSeats}"
                             th:selected="${showtime.room != null and showtime.room.id == room.id}">
                     </option>
                 </select>
+                <small id="roomSeatsHelp" class="form-text text-muted"></small>
+            </div>
+
+            <div class="form-group">
+                <label for="customTotalSeats">Số ghế tùy chỉnh (để trống nếu dùng số ghế của phòng):</label>
+                <input type="number" id="customTotalSeats" th:field="*{customTotalSeats}" class="form-control" min="1" />
+                <small class="form-text text-muted">Nếu bạn nhập giá trị ở đây, nó sẽ ghi đè lên tổng số ghế mặc định của phòng.</small>
             </div>
 
             <div class="form-group">
@@ -73,5 +81,35 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        document.addEventListener('DOMContentLoaded', function() {
+            var roomSelect = document.getElementById('room');
+            var customTotalSeatsInput = document.getElementById('customTotalSeats');
+            var roomSeatsHelp = document.getElementById('roomSeatsHelp');
+
+            function updateRoomSeatsDisplay() {
+                var selectedOption = roomSelect.options[roomSelect.selectedIndex];
+                var roomTotalSeats = selectedOption.getAttribute('data-total-seats');
+                var customSeats = customTotalSeatsInput.value;
+
+                if (customSeats && parseInt(customSeats) > 0) {
+                    roomSeatsHelp.textContent = 'Số ghế hiệu dụng cho suất chiếu này: ' + customSeats + ' (tùy chỉnh).';
+                } else if (roomTotalSeats) {
+                    roomSeatsHelp.textContent = 'Tổng số ghế mặc định của phòng: ' + roomTotalSeats + ' ghế.';
+                } else {
+                    roomSeatsHelp.textContent = '';
+                }
+            }
+
+            // Update on page load
+            updateRoomSeatsDisplay();
+
+            // Update when selection changes
+            roomSelect.addEventListener('change', updateRoomSeatsDisplay);
+            customTotalSeatsInput.addEventListener('input', updateRoomSeatsDisplay); // Listen to input changes
+        });
+        /*]]>*/
+    </script>
 </body>
 </html>

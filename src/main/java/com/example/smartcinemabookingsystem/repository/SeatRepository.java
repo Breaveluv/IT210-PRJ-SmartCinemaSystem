@@ -9,4 +9,7 @@ import java.util.List;
 @Repository
 public interface SeatRepository extends JpaRepository<Seat, Long> {
     List<Seat> findByRoomId(Long roomId);
+
+    // Added for CORE-08 to count total seats in a room
+    long countByRoomId(Long roomId);
 }

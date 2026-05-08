@@ -11,7 +11,8 @@
         <div class="row">
             <div class="col-md-3 mb-4" th:each="movie : ${movies}">
                 <div class="card movie-card h-100 shadow-sm">
-                    <img th:src="${movie.posterUrl != null ? movie.posterUrl : 'https://via.placeholder.com/300x450'}"
+                    <img th:src="${movie.posterUrl != null ? movie.posterUrl : 'https://via.placeholder.com/300x450?text=No+Image'}"
+                         onerror="this.onerror=null;this.src='https://via.placeholder.com/300x450?text=No+Image';"
                          class="card-img-top" alt="Movie Poster">
                     <div class="card-body">
                         <h5 class="card-title text-truncate" th:text="${movie.title}">Tên phim</h5>
@@ -29,6 +30,6 @@
         </div>
     </div>
 
-    <footer th:replace="~{home :: footer}"></footer>
+    <!-- Footer is now handled by layout.html -->
 </body>
 </html>

@@ -24,7 +24,7 @@ public class Movie {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private int duration; // in minutes
+    private int duration;
     private String posterUrl;
 
     @ManyToMany(fetch = FetchType.EAGER)

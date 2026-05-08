@@ -2,7 +2,7 @@
 <html lang="vi"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{admin/layout}">
+      layout:decorate="~{admin/layout(param=page:'bookings')}">
 
 <head>
     <meta charset="UTF-8">
@@ -236,44 +236,44 @@
 <div layout:fragment="content">
 
     <!-- HEADER -->
-    <div class="section-header">
+    <div class="section-header mb-4">
         <div>
-            <h2 style="color:white; margin:0; font-weight:700;">Quản lý Đặt vé</h2>
-            <p style="color:#94a3b8; margin:5px 0 0;">CORE-06 & CORE-07: Quản lý thanh toán và lịch sử đặt vé</p>
+            <h2 class="text-white fw-bold mb-0">Quản lý Đặt vé</h2>
+            <p class="text-muted mb-0 mt-2">CORE-06 & CORE-07: Quản lý thanh toán và lịch sử đặt vé</p>
         </div>
     </div>
 
     <!-- STATISTICS -->
-    <div class="stats-row">
+    <div class="stats-row mb-4">
         <div class="stat-card">
-            <h3 th:text="${bookings.size()}">0</h3>
-            <p>Tổng đặt vé</p>
+            <h3 class="text-white mb-0 fs-3 fw-bold" th:text="${bookings.size()}">0</h3>
+            <p class="text-muted fs-6 mt-2 mb-0">Tổng đặt vé</p>
         </div>
         <div class="stat-card">
-            <h3 th:text="${bookings.stream().filter(b -> b.status.name() == 'CONFIRMED').count()}">0</h3>
-            <p>Đã xác nhận</p>
+            <h3 class="text-white mb-0 fs-3 fw-bold" th:text="${bookings.stream().filter(b -> b.status.name() == 'CONFIRMED').count()}">0</h3>
+            <p class="text-muted fs-6 mt-2 mb-0">Đã xác nhận</p>
         </div>
         <div class="stat-card">
-            <h3 th:text="${bookings.stream().filter(b -> b.status.name() == 'PENDING').count()}">0</h3>
-            <p>Đang chờ</p>
+            <h3 class="text-white mb-0 fs-3 fw-bold" th:text="${bookings.stream().filter(b -> b.status.name() == 'PENDING').count()}">0</h3>
+            <p class="text-muted fs-6 mt-2 mb-0">Đang chờ</p>
         </div>
         <div class="stat-card">
-            <h3 th:text="${bookings.stream().filter(b -> b.status.name() == 'CANCELLED').count()}">0</h3>
-            <p>Đã hủy</p>
+            <h3 class="text-white mb-0 fs-3 fw-bold" th:text="${bookings.stream().filter(b -> b.status.name() == 'CANCELLED').count()}">0</h3>
+            <p class="text-muted fs-6 mt-2 mb-0">Đã hủy</p>
         </div>
     </div>
 
     <!-- FILTER -->
-    <div class="filter-box">
+    <div class="filter-box mb-4 d-flex gap-2 flex-wrap">
         <div class="filter-item">
-            <select id="statusFilter">
-                <option value="">Tất cả trạng thái</option>
+            <select class="form-select form-select-sm" aria-label="Status Filter">
+                <option selected>Tất cả trạng thái</option>
                 <option value="PENDING">Đang chờ</option>
                 <option value="CONFIRMED">Đã xác nhận</option>
                 <option value="CANCELLED">Đã hủy</option>
             </select>
         </div>
-        <button style="background:linear-gradient(135deg,#ff3d6e,#ff6b81); border:none; color:white; padding:8px 14px; border-radius:8px; cursor:pointer; font-weight:600;">
+        <button class="btn btn-gradient btn-sm fw-bold d-inline-flex align-items-center gap-2">
             <i class="fa-solid fa-search"></i> Tìm kiếm
         </button>
     </div>
@@ -285,22 +285,22 @@
 
             <div class="booking-info">
 
-                <div class="booking-user">
+                <div class="booking-user d-flex align-items-center gap-3">
 
                     <div class="booking-user-avatar">
                         <i class="fa-solid fa-user"></i>
                     </div>
 
                     <div class="booking-details">
-                        <h5 th:text="${booking.user.name}">Customer Name</h5>
-                        <p th:text="${booking.user.email}">customer@email.com</p>
-                        <p th:text="|Booking ID: #${booking.id}|">Booking ID: #1234</p>
+                        <h5 class="text-white mb-0 fw-600" th:text="${booking.user.name}">Customer Name</h5>
+                        <p class="text-muted fs-6 mb-1" th:text="${booking.user.email}">customer@email.com</p>
+                        <p class="text-muted fs-6 mb-0" th:text="|Booking ID: #${booking.id}|">Booking ID: #1234</p>
                     </div>
 
                 </div>
 
                 <span th:switch="${booking.status.name()}"
-                      class="status-badge"
+                      class="badge rounded-pill status-badge"
                       th:classappend="${booking.status.name() == 'PENDING' ? 'status-pending' : booking.status.name() == 'CONFIRMED' ? 'status-confirmed' : 'status-cancelled'}">
                     <span th:case="'PENDING'">Đang chờ xác nhận</span>
                     <span th:case="'CONFIRMED'">Đã xác nhận</span>
@@ -310,38 +310,38 @@
             </div>
 
             <!-- Booking Meta -->
-            <div class="booking-meta" style="margin-bottom:15px; padding-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.06);">
+            <div class="booking-meta d-flex gap-4 flex-wrap mb-3 pb-3 border-bottom border-secondary">
 
                 <div class="meta-item">
                     <span class="meta-label">Ngày đặt</span>
-                    <span class="meta-value" th:text="${#temporals.format(booking.bookingTime, 'dd/MM/yyyy HH:mm')}">01/05/2026 14:30</span>
+                    <span class="meta-value text-white fw-bold" th:text="${#temporals.format(booking.bookingTime, 'dd/MM/yyyy HH:mm')}">01/05/2026 14:30</span>
                 </div>
 
                 <div class="meta-item">
                     <span class="meta-label">Tổng tiền</span>
-                    <span class="meta-value" th:text="|${#numbers.formatDecimal(booking.totalAmount,1,2)} VND|">250,000 VND</span>
+                    <span class="meta-value text-white fw-bold" th:text="|${#numbers.formatDecimal(booking.totalAmount,1,2)} VND|">250,000 VND</span>
                 </div>
 
                 <div class="meta-item">
                     <span class="meta-label">Số vé</span>
-                    <span class="meta-value" th:text="${booking.tickets.size()} + ' vé'">3 vé</span>
+                    <span class="meta-value text-white fw-bold" th:text="${booking.tickets.size()} + ' vé'">3 vé</span>
                 </div>
 
             </div>
 
             <!-- Action Buttons -->
-            <div class="action-buttons">
+            <div class="action-buttons d-flex gap-2">
 
                 <a th:href="@{/admin/bookings/{id}(id=${booking.id})}"
-                   class="action-btn btn-view">
+                   class="action-btn btn btn-sm btn-info d-inline-flex align-items-center gap-2">
                     <i class="fa-solid fa-eye"></i>
                     Chi tiết
                 </a>
 
                 <th:block th:if="${booking.status.name() == 'PENDING'}">
                     <button type="button"
-                            th:onclick="|confirmBooking(${booking.id})|"
-                            class="action-btn btn-confirm">
+                            class="action-btn btn btn-sm btn-success d-inline-flex align-items-center gap-2"
+                            onclick="return confirm('Xác nhận thanh toán cho đơn này?')">
                         <i class="fa-solid fa-check"></i>
                         Xác nhận
                     </button>
@@ -349,8 +349,8 @@
 
                 <th:block th:if="${booking.status.name() != 'CANCELLED'}">
                     <button type="button"
-                            th:onclick="|cancelBooking(${booking.id})|"
-                            class="action-btn btn-cancel">
+                            class="action-btn btn btn-sm btn-danger d-inline-flex align-items-center gap-2"
+                            onclick="return confirm('Hủy đơn đặt vé này? Ghế sẽ được giải phóng.')">
                         <i class="fa-solid fa-times"></i>
                         Hủy
                     </button>
@@ -363,34 +363,13 @@
     </div>
 
     <!-- EMPTY STATE -->
-    <div th:if="${bookings.size() == 0}" class="empty-state">
-        <i class="fa-solid fa-inbox"></i>
+    <div th:if="${bookings.size() == 0}" class="empty-state text-center text-muted py-5">
+        <i class="fa-solid fa-inbox fs-1 d-block mb-3"></i>
         <p>Không có đặt vé nào</p>
     </div>
 
 </div>
 
-<!-- Scripts -->
-<script>
-    function confirmBooking(bookingId) {
-        if (confirm('Bạn có chắc chắn muốn xác nhận đơn đặt vé này?')) {
-            console.log('Confirm booking:', bookingId);
-            // TODO: Implement API call to confirm booking
-        }
-    }
-
-    function cancelBooking(bookingId) {
-        if (confirm('Bạn có chắc chắn muốn hủy đơn đặt vé này? Ghế sẽ được giải phóng.')) {
-            console.log('Cancel booking:', bookingId);
-            // TODO: Implement API call to cancel booking
-        }
-    }
-
-    document.getElementById('statusFilter').addEventListener('change', function() {
-        console.log('Filter by status:', this.value);
-        // TODO: Implement filtering
-    });
-</script>
 
 </body>
 </html>

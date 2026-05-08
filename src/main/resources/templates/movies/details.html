@@ -9,8 +9,9 @@
     <div class="container mt-4">
         <div class="row" th:if="${movie}">
             <div class="col-md-4">
-                <img th:src="${movie.posterUrl != null ? movie.posterUrl : 'https://via.placeholder.com/300x450'}"
-                     class="img-fluid rounded shadow" alt="Movie Poster">
+                <img th:src="${movie.posterUrl != null ? movie.posterUrl : 'https://via.placeholder.com/300x450?text=No+Image'}"
+                     onerror="this.onerror=null;this.src='https://via.placeholder.com/300x450?text=No+Image';"
+                     class="img-fluid rounded shadow movie-details-poster" alt="Movie Poster">
             </div>
             <div class="col-md-8">
                 <h1 th:text="${movie.title}">Tên phim</h1>
@@ -39,6 +40,6 @@
         </div>
     </div>
 
-    <footer th:replace="~{home :: footer}"></footer>
+    <!-- Footer is now handled by layout.html -->
 </body>
 </html>
