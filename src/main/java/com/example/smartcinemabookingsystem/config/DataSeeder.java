@@ -2,6 +2,7 @@ package com.example.smartcinemabookingsystem.config;
 
 import com.example.smartcinemabookingsystem.model.*;
 import com.example.smartcinemabookingsystem.repository.*;
+import com.example.smartcinemabookingsystem.service.ShowtimeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -20,7 +21,7 @@ public class DataSeeder implements CommandLineRunner {
     private final MovieRepository movieRepository;
     private final RoomRepository roomRepository;
     private final SeatRepository seatRepository;
-    private final ShowtimeRepository showtimeRepository;
+    private final ShowtimeService showtimeService;
     private final UserRepository userRepository;
 
     @Override
@@ -98,40 +99,40 @@ public class DataSeeder implements CommandLineRunner {
 
 
         // Showtimes
-        showtimeRepository.save(new Showtime(null, movie1, room1,
+        showtimeService.saveShowtime(new Showtime(null, movie1, room1,
                 LocalDateTime.now().plusHours(2), LocalDateTime.now().plusHours(5), 75000, null));
 
-        showtimeRepository.save(new Showtime(null, movie2, room2,
+        showtimeService.saveShowtime(new Showtime(null, movie2, room2,
                 LocalDateTime.now().plusHours(1), LocalDateTime.now().plusHours(3), 60000, null));
 
-        showtimeRepository.save(new Showtime(null, movie3, room3,
+        showtimeService.saveShowtime(new Showtime(null, movie3, room3,
                 LocalDateTime.now().plusHours(3), LocalDateTime.now().plusHours(6), 80000, null));
 
-        showtimeRepository.save(new Showtime(null, movie4, room1,
-                LocalDateTime.now().plusHours(4), LocalDateTime.now().plusHours(6).plusMinutes(30), 70000, null));
+        showtimeService.saveShowtime(new Showtime(null, movie4, room1,
+                LocalDateTime.now().plusHours(5).plusMinutes(15), LocalDateTime.now().plusHours(6).plusMinutes(30), 70000, null));
 
-        showtimeRepository.save(new Showtime(null, movie5, room2,
+        showtimeService.saveShowtime(new Showtime(null, movie5, room2,
                 LocalDateTime.now().plusHours(5), LocalDateTime.now().plusHours(7).plusMinutes(30), 75000, null));
 
-        showtimeRepository.save(new Showtime(null, movie6, room3,
-                LocalDateTime.now().plusHours(6), LocalDateTime.now().plusHours(8).plusMinutes(30), 65000, null));
+        showtimeService.saveShowtime(new Showtime(null, movie6, room3,
+                LocalDateTime.now().plusHours(6).plusMinutes(30), LocalDateTime.now().plusHours(8).plusMinutes(30), 65000, null));
 
-        showtimeRepository.save(new Showtime(null, movie7, room1,
-                LocalDateTime.now().plusHours(7), LocalDateTime.now().plusHours(10), 85000, null));
+        showtimeService.saveShowtime(new Showtime(null, movie7, room1,
+                LocalDateTime.now().plusHours(7).plusMinutes(30), LocalDateTime.now().plusHours(10), 85000, null));
 
-        showtimeRepository.save(new Showtime(null, movie8, room2,
+        showtimeService.saveShowtime(new Showtime(null, movie8, room2,
                 LocalDateTime.now().plusHours(8), LocalDateTime.now().plusHours(10).plusMinutes(30), 70000, null));
 
-        showtimeRepository.save(new Showtime(null, movie9, room3,
+        showtimeService.saveShowtime(new Showtime(null, movie9, room3,
                 LocalDateTime.now().plusHours(9), LocalDateTime.now().plusHours(11), 60000, null));
 
-        showtimeRepository.save(new Showtime(null, movie10, room1,
-                LocalDateTime.now().plusHours(10), LocalDateTime.now().plusHours(12).plusMinutes(30), 75000, null));
+        showtimeService.saveShowtime(new Showtime(null, movie10, room1,
+                LocalDateTime.now().plusHours(10).plusMinutes(45), LocalDateTime.now().plusHours(12).plusMinutes(30), 75000, null));
 
-        showtimeRepository.save(new Showtime(null, movie11, room2,
+        showtimeService.saveShowtime(new Showtime(null, movie11, room2,
                 LocalDateTime.now().plusHours(11), LocalDateTime.now().plusHours(13).plusMinutes(30), 80000, null));
 
-        showtimeRepository.save(new Showtime(null, movie12, room3,
+        showtimeService.saveShowtime(new Showtime(null, movie12, room3,
                 LocalDateTime.now().plusHours(12), LocalDateTime.now().plusHours(14).plusMinutes(30), 70000, null));
 
 

@@ -3,7 +3,6 @@ package com.example.smartcinemabookingsystem.service;
 import com.example.smartcinemabookingsystem.exception.ShowtimeConflictException;
 import com.example.smartcinemabookingsystem.model.Booking;
 import com.example.smartcinemabookingsystem.model.Showtime;
-import com.example.smartcinemabookingsystem.repository.SeatRepository;
 import com.example.smartcinemabookingsystem.repository.ShowtimeRepository;
 import com.example.smartcinemabookingsystem.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,66 +19,75 @@ import java.util.stream.Collectors;
 public class ShowtimeService {
 
     private final ShowtimeRepository showtimeRepository;
-    private final SeatRepository seatRepository; // Vẫn giữ để dùng cho các mục đích khác nếu cần
     private final TicketRepository ticketRepository;
+    private final RoomService roomService;
 
-    private static final int CLEANUP_BUFFER_MINUTES = 15; // Thời gian dọn phòng
+    private static final int CLEANUP_BUFFER_MINUTES = 15;
 
     public List<Showtime> getShowtimesByMovieId(Long movieId) {
-        return showtimeRepository.findByMovieId(movieId);
+        return showtimeRepository.findByMovieId(movieId).stream()
+                .map(this::decorateAvailability)
+                .collect(Collectors.toList());
     }
 
-    // Phương thức mới để lấy tất cả suất chiếu (cho Admin)
+    public List<Showtime> getFutureShowtimesByMovieId(Long movieId) {
+        return showtimeRepository.findByMovieId(movieId).stream()
+                .filter(showtime -> showtime.getStartTime().isAfter(LocalDateTime.now()))
+                .map(this::decorateAvailability)
+                .collect(Collectors.toList());
+    }
+
     public List<Showtime> getAllShowtimes() {
-        return showtimeRepository.findAll();
+        return showtimeRepository.findAll().stream()
+                .map(this::decorateAvailability)
+                .collect(Collectors.toList());
     }
 
-    // Phương thức mới để lấy suất chiếu theo ID
     public Optional<Showtime> getShowtimeById(Long id) {
-        return showtimeRepository.findById(id);
+        return showtimeRepository.findById(id).map(this::decorateAvailability);
     }
 
     @Transactional
     public Showtime saveShowtime(Showtime newShowtime) {
-        // 1. Fetch movie to get its duration if not already set (e.g., in case of update)
         if (newShowtime.getMovie() == null || newShowtime.getMovie().getId() == null) {
             throw new IllegalArgumentException("Movie information is required for showtime.");
         }
-        // In a real application, you'd fetch the full Movie object here if needed,
-        // but for conflict check, we only need duration which should be available
-        // if the movie object is properly managed by JPA or fetched.
-        // For simplicity, assuming newShowtime.getMovie().getDuration() is already populated
-        // or the movie object is managed. If not, you'd inject MovieService and fetch it.
+        if (newShowtime.getRoom() == null || newShowtime.getRoom().getId() == null) {
+            throw new IllegalArgumentException("Room information is required for showtime.");
+        }
+        if (newShowtime.getStartTime() == null) {
+            throw new IllegalArgumentException("Start time is required for showtime.");
+        }
 
-        // 2. Calculate actual end time including movie duration
         LocalDateTime movieEndTime = newShowtime.getStartTime().plusMinutes(newShowtime.getMovie().getDuration());
         newShowtime.setEndTime(movieEndTime);
 
-        // 3. Calculate end time with cleanup buffer
-        LocalDateTime showtimeEndTimeWithBuffer = movieEndTime.plusMinutes(CLEANUP_BUFFER_MINUTES);
+        roomService.ensureSeatCount(newShowtime.getRoom());
+        Integer customTotalSeats = newShowtime.getCustomTotalSeats();
+        if (customTotalSeats != null && customTotalSeats > newShowtime.getRoom().getTotalSeats()) {
+            throw new IllegalArgumentException("So ghe cua suat chieu khong duoc lon hon tong so ghe cua phong.");
+        }
 
-        // 4. Check for conflicts in the same room
+        LocalDateTime showtimeEndTimeWithBuffer = movieEndTime.plusMinutes(CLEANUP_BUFFER_MINUTES);
         List<Showtime> existingShowtimesInRoom = showtimeRepository.findByRoomId(newShowtime.getRoom().getId());
 
         for (Showtime existingShowtime : existingShowtimesInRoom) {
-            // If it's an update, exclude the showtime itself from conflict check
             if (newShowtime.getId() != null && newShowtime.getId().equals(existingShowtime.getId())) {
                 continue;
             }
 
-            LocalDateTime existingShowtimeEndTimeWithBuffer = existingShowtime.getEndTime().plusMinutes(CLEANUP_BUFFER_MINUTES);
-
-            // Check for overlap: [start1, end1_buffer] overlaps with [start2, end2_buffer] if (start1 < end2_buffer AND start2 < end1_buffer)
-            boolean overlap = (newShowtime.getStartTime().isBefore(existingShowtimeEndTimeWithBuffer) &&
-                               existingShowtime.getStartTime().isBefore(showtimeEndTimeWithBuffer));
+            LocalDateTime existingShowtimeEndTimeWithBuffer =
+                    existingShowtime.getEndTime().plusMinutes(CLEANUP_BUFFER_MINUTES);
+            boolean overlap = newShowtime.getStartTime().isBefore(existingShowtimeEndTimeWithBuffer)
+                    && existingShowtime.getStartTime().isBefore(showtimeEndTimeWithBuffer);
 
             if (overlap) {
                 throw new ShowtimeConflictException(
-                        "Phòng " + newShowtime.getRoom().getName() +
-                        " đã có suất chiếu khác từ " +
-                        existingShowtime.getStartTime().toLocalTime() + " đến " +
-                        existingShowtimeEndTimeWithBuffer.toLocalTime() +
-                        " (bao gồm thời gian dọn phòng). Vui lòng chọn thời gian khác."
+                        "Phong " + newShowtime.getRoom().getName()
+                                + " da co suat chieu khac tu "
+                                + existingShowtime.getStartTime().toLocalTime()
+                                + " den " + existingShowtimeEndTimeWithBuffer.toLocalTime()
+                                + " (bao gom thoi gian don phong). Vui long chon thoi gian khac."
                 );
             }
         }
@@ -87,58 +95,48 @@ public class ShowtimeService {
         return showtimeRepository.save(newShowtime);
     }
 
-    // Phương thức mới để xóa suất chiếu
     public void deleteShowtime(Long id) {
         showtimeRepository.deleteById(id);
     }
 
-    /**
-     * CORE-08: Lấy danh sách các suất chiếu sắp tới và kiểm tra trạng thái "Hết vé".
-     * Suất chiếu phải tự động thay đổi trạng thái hoặc bị ẩn đi khi:
-     * - Thời gian hiện tại đã vượt quá thời gian bắt đầu của suất chiếu (Ẩn hoàn toàn).
-     * - Toàn bộ ghế trong phòng của suất chiếu đó đã được đặt (Sold out) (Vẫn cho xem sơ đồ ghế nhưng hiển thị nhãn “Hết vé”).
-     */
     public List<Showtime> getUpcomingShowtimesWithAvailability() {
-        // Filter out showtimes that have already started
-        List<Showtime> upcomingShowtimes = showtimeRepository.findByStartTimeAfter(LocalDateTime.now());
-
-        // For each upcoming showtime, determine if it's sold out
-        return upcomingShowtimes.stream().map(showtime -> {
-            // Sử dụng logic effectiveTotalSeats tương tự như isShowtimeSoldOut
-            long effectiveTotalSeats;
-            if (showtime.getCustomTotalSeats() != null && showtime.getCustomTotalSeats() > 0) {
-                effectiveTotalSeats = showtime.getCustomTotalSeats();
-            } else {
-                // Lấy tổng số ghế từ thuộc tính totalSeats của Room
-                effectiveTotalSeats = showtime.getRoom().getTotalSeats();
-            }
-
-            long bookedSeats = ticketRepository.countByShowtimeIdAndBookingStatusNot(showtime.getId(), Booking.BookingStatus.CANCELLED);
-
-            // Nếu cần hiển thị trạng thái sold out trực tiếp trên đối tượng Showtime,
-            // bạn có thể thêm một trường transient vào Showtime hoặc sử dụng DTO.
-            // Hiện tại, logic isShowtimeSoldOut sẽ được gọi riêng trong template.
-            return showtime;
-        }).collect(Collectors.toList());
+        return showtimeRepository.findByStartTimeAfter(LocalDateTime.now()).stream()
+                .map(this::decorateAvailability)
+                .collect(Collectors.toList());
     }
 
     public boolean isShowtimeSoldOut(Long showtimeId) {
         Optional<Showtime> showtimeOpt = showtimeRepository.findById(showtimeId);
         if (showtimeOpt.isEmpty()) {
-            return false; // Hoặc ném một ngoại lệ nếu suất chiếu không tồn tại
+            return false;
         }
+
         Showtime showtime = showtimeOpt.get();
+        long bookedSeats = ticketRepository.countByShowtimeIdAndBookingStatusNot(
+                showtime.getId(), Booking.BookingStatus.CANCELLED);
+        return bookedSeats >= getEffectiveTotalSeats(showtime);
+    }
 
-        // Xác định tổng số ghế hiệu dụng cho suất chiếu này
-        long effectiveTotalSeats;
-        if (showtime.getCustomTotalSeats() != null && showtime.getCustomTotalSeats() > 0) {
-            effectiveTotalSeats = showtime.getCustomTotalSeats();
+    public Showtime decorateAvailability(Showtime showtime) {
+        boolean started = !showtime.getStartTime().isAfter(LocalDateTime.now());
+        boolean soldOut = isShowtimeSoldOut(showtime.getId());
+
+        showtime.setStarted(started);
+        showtime.setSoldOut(soldOut);
+        if (started) {
+            showtime.setStatusLabel("Da qua gio");
+        } else if (soldOut) {
+            showtime.setStatusLabel("Het ve");
         } else {
-            // Lấy tổng số ghế từ thuộc tính totalSeats của Room
-            effectiveTotalSeats = showtime.getRoom().getTotalSeats();
+            showtime.setStatusLabel("Con ve");
         }
+        return showtime;
+    }
 
-        long bookedSeats = ticketRepository.countByShowtimeIdAndBookingStatusNot(showtime.getId(), Booking.BookingStatus.CANCELLED);
-        return bookedSeats >= effectiveTotalSeats;
+    private long getEffectiveTotalSeats(Showtime showtime) {
+        if (showtime.getCustomTotalSeats() != null && showtime.getCustomTotalSeats() > 0) {
+            return showtime.getCustomTotalSeats();
+        }
+        return showtime.getRoom().getTotalSeats();
     }
 }

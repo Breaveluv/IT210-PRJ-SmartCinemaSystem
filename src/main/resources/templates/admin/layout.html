@@ -31,27 +31,28 @@
         }
 
         body{
-            background:#0f172a;
+            background:#0d1626;
             overflow-x:hidden;
         }
 
         /* SIDEBAR */
 
         .sidebar{
-            width:280px;
+            width:336px;
             height:100vh;
             position:fixed;
             top:0;
             left:0;
-            background:#111827;
-            padding:30px 20px;
+            background:#101928;
+            padding:36px 22px;
         }
 
         .logo{
             color:white;
-            font-size:30px;
+            font-size:34px;
             font-weight:700;
-            margin-bottom:40px;
+            margin-bottom:54px;
+            letter-spacing:-1px;
         }
 
         .logo span{
@@ -69,25 +70,34 @@
             display:flex;
             align-items:center;
             gap:14px;
-            padding:14px 18px;
+            width:280px;
+            min-height:60px;
+            padding:16px 16px;
             text-decoration:none;
-            color:#cbd5e1;
-            border-radius:16px;
-            margin-bottom:12px;
+            color:#eaf1ff;
+            border-radius:11px;
+            margin-bottom:10px;
+            font-size:20px;
+            line-height:1;
             transition:0.3s;
         }
 
         .sidebar a:hover,
         .sidebar a.active{
-            background:linear-gradient(135deg,#ff4d6d,#ff758f);
+            background:#ff4773;
             color:white;
+        }
+
+        .sidebar i{
+            width:24px;
+            text-align:center;
         }
 
         /* MAIN */
 
         .main-content{
-            margin-left:280px;
-            padding:30px;
+            margin-left:336px;
+            padding:38px 20px 38px 24px;
         }
 
         /* TOPBAR */
@@ -96,12 +106,14 @@
             display:flex;
             justify-content:space-between;
             align-items:center;
-            margin-bottom:35px;
+            margin-bottom:30px;
         }
 
         .topbar h2{
             color:white;
             font-weight:700;
+            font-size:40px;
+            letter-spacing:0;
         }
 
         .topbar p{
@@ -122,17 +134,31 @@
             color:#94a3b8;
         }
 
-        .profile{
-            display:flex;
-            align-items:center;
-            gap:15px;
-        }
+        @media (max-width: 900px){
+            .sidebar{
+                position:static;
+                width:100%;
+                height:auto;
+                padding:20px;
+            }
 
-        .profile img{
-            width:50px;
-            height:50px;
-            border-radius:50%;
-            border:3px solid #ff4d6d;
+            .sidebar a{
+                width:100%;
+            }
+
+            .main-content{
+                margin-left:0;
+                padding:20px;
+            }
+
+            .topbar{
+                align-items:flex-start;
+                flex-direction:column;
+            }
+
+            .topbar h2{
+                font-size:30px;
+            }
         }
 
     </style>
@@ -168,6 +194,16 @@
         Showtimes
     </a>
 
+    <a th:href="@{/admin/rooms}" th:classappend="${param.page == 'rooms' ? 'active' : ''}">
+        <i class="fa-solid fa-door-open"></i>
+        Rooms
+    </a>
+
+    <a th:href="@{/admin/genres}" th:classappend="${param.page == 'genres' ? 'active' : ''}">
+        <i class="fa-solid fa-tags"></i>
+        Genres
+    </a>
+
     <a th:href="@{/admin/bookings}" th:classappend="${param.page == 'bookings' ? 'active' : ''}">
         <i class="fa-solid fa-ticket"></i>
         Bookings
@@ -181,11 +217,6 @@
     <div class="menu-title">
         Settings
     </div>
-
-    <a th:href="@{/admin/settings}" th:classappend="${param.page == 'settings' ? 'active' : ''}">
-        <i class="fa-solid fa-gear"></i>
-        Settings
-    </a>
 
     <a th:href="@{/logout}">
         <i class="fa-solid fa-right-from-bracket"></i>
@@ -205,17 +236,6 @@
         <div>
             <h2>Cinema Dashboard</h2>
             <p>Manage your cinema system</p>
-        </div>
-
-        <div class="profile">
-
-            <input type="text"
-                   class="search-box"
-                   placeholder="Search...">
-
-            <img th:src="@{https://i.pravatar.cc/100}"
-                 th:alt="${#authentication.name ?: 'Admin'}">
-
         </div>
 
     </div>

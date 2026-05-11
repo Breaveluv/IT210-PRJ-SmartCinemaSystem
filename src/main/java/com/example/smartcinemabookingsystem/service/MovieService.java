@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional; // Import Optional
 
@@ -28,6 +29,11 @@ public class MovieService {
     public Page<Movie> getPaginatedMovies(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return movieRepository.findAll(pageable);
+    }
+
+    public Page<Movie> getPaginatedMoviesWithFutureShowtimes(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return movieRepository.findMoviesWithFutureShowtimes(LocalDateTime.now(), pageable);
     }
 
     public Movie saveMovie(Movie movie) {

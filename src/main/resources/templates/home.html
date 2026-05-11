@@ -1,36 +1,48 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/header :: header-css}">
-    <title>Trang chủ - Smart Cinema</title>
-</head>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head(pageTitle='Trang chủ - CinemaMax')}"></head>
 <body>
-<div th:replace="~{fragments/header :: navbar}"></div>
-
-<div class="container mt-4">
-    <h2 class="mb-4 text-center">Phim Đang Chiếu</h2>
-    <div class="row">
-        <div class="col-md-3 mb-4" th:each="movie : ${movies}">
-            <div class="card movie-card h-100 shadow-sm">
-                <img th:src="${movie.posterUrl != null ? movie.posterUrl : 'https://upload.wikimedia.org/wikipedia/vi/4/48/%C4%90%C3%B4r%C3%AAmon-_Cu%E1%BB%99c_x%C3%A2m_l%C4%83ng_m%E1%BB%9Bi.jpg.jpg'}"
-                     class="card-img-top" alt="Movie Poster">
-                <div class="card-body">
-                    <h5 class="card-title text-truncate" th:text="${movie.title}">Tên phim</h5>
-                    <p class="card-text text-muted small" th:text="${movie.duration + ' phút'}">Thời lượng</p>
-                    <a th:href="@{'/movie/' + ${movie.id}}" class="btn btn-outline-primary w-100">Chi tiết & Đặt vé</a>                </div>
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+<header class="hero-section">
+    <div class="container">
+        <div class="col-lg-6">
+            <span class="badge bg-danger mb-3 px-3 py-2 rounded-pill">ĐANG CHIẾU</span>
+            <h1 class="display-3 fw-bold mb-3">DUNE: PART TWO</h1>
+            <p class="lead text-secondary mb-4">Hành trình tiếp theo của Paul Atreides trên hành tinh cát Arrakis, nơi anh hợp lực với Chani và người Fremen để trả thù.</p>
+            <div class="d-flex gap-3">
+                <a href="#movies" class="btn btn-primary btn-lg px-4"><i class="fa-solid fa-ticket me-2"></i>ĐẶT VÉ NGAY</a>
+                <button class="btn btn-outline-light btn-lg px-4 rounded-3"><i class="fa-solid fa-play me-2"></i>Trailer</button>
             </div>
         </div>
-        <div th:if="${#lists.isEmpty(movies)}" class="col-12 text-center">
-            <p class="lead text-muted">Hiện chưa có phim nào đang chiếu.</p>
+    </div>
+</header>
+
+<main class="container py-5" id="movies">
+    <div class="d-flex justify-content-between align-items-end mb-5">
+        <h2 class="fw-bold m-0"><span class="text-primary">|</span> PHIM ĐANG CHIẾU</h2>
+        <a th:href="@{/movie}" class="text-secondary text-decoration-none small">Tất cả phim <i class="fa-solid fa-chevron-right ms-1"></i></a>    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-6 col-md-3" th:each="movie : ${movies}">
+            <div class="movie-card">
+                <img th:src="${movie.posterUrl}" class="w-100" th:alt="${movie.title}">
+                <div class="p-3">
+                    <h6 class="fw-bold text-truncate" th:text="${movie.title}"></h6>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <span class="text-secondary small" th:text="${movie.duration + ' phút'}"></span>
+                        <a th:href="@{'/movie/' + ${movie.id}}" class="btn btn-primary btn-sm">Đặt vé</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
-<footer class="text-center bg-dark text-white py-4 mt-5">
-    <div class="container">
-        <p class="mb-0">&copy; 2023 Smart Cinema Booking System. All rights reserved.</p>
+    <!-- Upcoming Showtimes Section -->
+
     </div>
-</footer>
+</main>
 
+<footer th:replace="~{fragments/footer :: footer}"></footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

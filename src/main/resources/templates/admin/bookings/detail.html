@@ -263,7 +263,7 @@
 
                 <div class="detail-row">
                     <span class="detail-label">Tên khách hàng</span>
-                    <span class="detail-value" th:text="${booking.user.name}">Customer Name</span>
+                    <span class="detail-value" th:text="${booking.user.fullName != null and !booking.user.fullName.isBlank() ? booking.user.fullName : booking.user.username}">Customer Name</span>
                 </div>
 
                 <div class="detail-row">

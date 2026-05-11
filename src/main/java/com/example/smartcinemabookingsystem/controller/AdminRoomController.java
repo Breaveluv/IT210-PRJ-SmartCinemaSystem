@@ -54,7 +54,7 @@ public class AdminRoomController {
         });
     }
 
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public String deleteRoom(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             roomService.deleteRoom(id);

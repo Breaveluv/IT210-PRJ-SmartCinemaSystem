@@ -1,45 +1,52 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/header :: header-css}">
-    <title>Chi tiết phim - Smart Cinema</title>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head(pageTitle='Chi tiết phim - CinemaMax')}">
 </head>
 <body>
-    <div th:replace="~{fragments/header :: navbar}"></div>
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
 
-    <div class="container mt-4">
-        <div class="row" th:if="${movie}">
-            <div class="col-md-4">
-                <img th:src="${movie.posterUrl != null ? movie.posterUrl : 'https://via.placeholder.com/300x450?text=No+Image'}"
-                     onerror="this.onerror=null;this.src='https://via.placeholder.com/300x450?text=No+Image';"
-                     class="img-fluid rounded shadow movie-details-poster" alt="Movie Poster">
-            </div>
-            <div class="col-md-8">
-                <h1 th:text="${movie.title}">Tên phim</h1>
-                <p class="text-muted">
-                    <span class="badge bg-secondary me-1" th:each="genre : ${movie.genres}" th:text="${genre.name}"></span>
-                    | <span th:text="${movie.duration + ' phút'}"></span>
-                </p>
-                <hr>
-                <h5>Nội dung phim</h5>
-                <p th:text="${movie.description}">Mô tả chi tiết phim...</p>
+<div class="container mt-5 pt-5"> <!-- Added pt-5 for fixed navbar -->
+    <div class="row" th:if="${movie}">
+        <div class="col-md-4">
+            <img th:src="${movie.posterUrl != null ? movie.posterUrl : 'https://via.placeholder.com/350x500?text=No+Image'}"
+                 onerror="this.onerror=null;this.src='https://via.placeholder.com/350x500?text=No+Image';"
+                 class="img-fluid rounded shadow movie-details-poster" alt="Movie Poster">
+        </div>
+        <div class="col-md-8 text-white">
+            <h1 class="fw-bold" th:text="${movie.title}">Tên phim</h1>
+            <p class="text-secondary">
+                <span class="badge bg-danger me-1" th:each="genre : ${movie.genres}" th:text="${genre.name}"></span>
+                | <span th:text="${movie.duration + ' phút'}"></span>
+            </p>
+            <hr class="border-secondary">
+            <h5 class="fw-bold">Nội dung phim</h5>
+            <p th:text="${movie.description}">Mô tả chi tiết phim...</p>
 
-                <h5 class="mt-4">Suất chiếu hiện có</h5>
-                <div class="list-group">
-                    <div th:each="showtime : ${showtimes}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong th:text="${#temporals.format(showtime.startTime, 'HH:mm dd/MM/yyyy')}"></strong>
-                            <span class="ms-3 text-muted" th:text="${'Phòng: ' + showtime.room.name}"></span>
-                        </div>
-                        <a th:href="@{'/booking/' + ${showtime.id}}" class="btn btn-sm btn-success">Chọn ghế</a>
+            <h5 class="mt-4 fw-bold">Suất chiếu hiện có</h5>
+            <div class="list-group">
+                <div th:each="showtime : ${showtimes}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center bg-dark text-white border-secondary mb-2 rounded">
+                    <div>
+                        <strong th:text="${#temporals.format(showtime.startTime, 'HH:mm dd/MM/yyyy')}"></strong>
+                        <span th:if="${showtime.soldOut}" class="badge bg-danger ms-2" th:text="${showtime.statusLabel}">Het ve</span>
+                        <span class="ms-3 text-secondary" th:text="${'Phòng: ' + showtime.room.name}"></span>
                     </div>
-                    <div th:if="${#lists.isEmpty(showtimes)}" class="alert alert-warning py-2 small">
-                        Hiện chưa có suất chiếu cho phim này.
-                    </div>
+                    <a th:if="${!showtime.soldOut}" th:href="@{'/booking/' + ${showtime.id}}" class="btn btn-sm btn-primary">Chọn ghế</a>
+                </div>
+                <div th:if="${#lists.isEmpty(showtimes)}" class="alert alert-warning py-2 small bg-dark text-warning border-warning" role="alert">
+                    Hiện chưa có suất chiếu cho phim này.
                 </div>
             </div>
         </div>
     </div>
+    <div class="row" th:unless="${movie}">
+        <div class="col-12 text-center mt-5 pt-5">
+            <h2 class="text-danger">Không tìm thấy phim</h2>
+            <p class="lead text-secondary">Vui lòng quay lại <a th:href="@{/}" class="text-primary">Trang chủ</a>.</p>
+        </div>
+    </div>
+</div>
 
-    <!-- Footer is now handled by layout.html -->
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<div th:replace="~{fragments/scripts :: scripts}"></div>
 </body>
 </html>

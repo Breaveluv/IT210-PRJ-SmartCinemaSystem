@@ -26,6 +26,7 @@ public class UserProfileController {
             return "redirect:/login";
         }
         model.addAttribute("user", loggedInUser);
+        addRoleProfileAttributes(model, loggedInUser);
         return "profile/view";
     }
 
@@ -36,6 +37,7 @@ public class UserProfileController {
             return "redirect:/login";
         }
         model.addAttribute("user", loggedInUser);
+        addRoleProfileAttributes(model, loggedInUser);
         return "profile/edit";
     }
 
@@ -60,5 +62,24 @@ public class UserProfileController {
             redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi cập nhật hồ sơ: " + e.getMessage());
         }
         return "redirect:/profile";
+    }
+
+    private void addRoleProfileAttributes(Model model, User user) {
+        if (user.getRole() == User.Role.ADMIN) {
+            model.addAttribute("profileType", "Admin");
+            model.addAttribute("profileDescription", "Quan tri he thong, phim, phong, suat chieu va tai khoan.");
+            model.addAttribute("primaryActionUrl", "/admin/dashboard");
+            model.addAttribute("primaryActionLabel", "Mo trang quan tri");
+        } else if (user.getRole() == User.Role.STAFF) {
+            model.addAttribute("profileType", "Nhan vien");
+            model.addAttribute("profileDescription", "Ho tro van hanh rap va tra cuu thong tin dat ve.");
+            model.addAttribute("primaryActionUrl", "/admin/bookings");
+            model.addAttribute("primaryActionLabel", "Xem danh sach dat ve");
+        } else {
+            model.addAttribute("profileType", "Khach hang");
+            model.addAttribute("profileDescription", "Quan ly thong tin ca nhan va lich su dat ve.");
+            model.addAttribute("primaryActionUrl", "/booking/history");
+            model.addAttribute("primaryActionLabel", "Xem lich su dat ve");
+        }
     }
 }

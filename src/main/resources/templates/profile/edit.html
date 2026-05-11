@@ -13,6 +13,10 @@
             <span th:text="${errorMessage}"></span>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
+        <div class="alert alert-info">
+            <strong th:text="${profileType}">Profile</strong>
+            <span th:text="${' - ' + profileDescription}"></span>
+        </div>
 
         <div class="card shadow-sm">
             <div class="card-header bg-dark text-white">

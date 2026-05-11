@@ -1,10 +1,32 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-    <footer th:fragment="footer" class="text-center bg-dark text-white py-4 mt-5">
-        <div class="container">
-            <p class="mb-0">&copy; 2023 Smart Cinema Booking System. All rights reserved.</p>
+<footer th:fragment="footer" class="py-5 mt-5" style="background: #020408; border-top: 1px solid rgba(255,255,255,0.05);">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <h3 class="navbar-brand">CINEMAMAX</h3>
+                <p class="text-secondary mt-3">Hệ thống đặt vé xem phim trực tuyến hiện đại nhất, mang đến trải nghiệm điện ảnh tuyệt vời nhất cho bạn.</p>
+            </div>
+            <div class="col-md-2 ms-auto">
+                <h6 class="fw-bold mb-4">HỖ TRỢ</h6>
+                <ul class="list-unstyled text-secondary small">
+                    <li class="mb-2"><a href="#" class="text-decoration-none text-secondary">Lịch chiếu</a></li>
+                    <li class="mb-2"><a href="#" class="text-decoration-none text-secondary">Rạp phim</a></li>
+                    <li class="mb-2"><a href="#" class="text-decoration-none text-secondary">Liên hệ</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h6 class="fw-bold mb-4">KẾT NỐI</h6>
+                <div class="d-flex gap-3 fs-4 text-secondary">
+                    <i class="fa-brands fa-facebook"></i>
+                    <i class="fa-brands fa-instagram"></i>
+                    <i class="fa-brands fa-youtube"></i>
+                </div>
+                <p class="mt-4 small text-secondary">&copy; 2024 CinemaMax System.</p>
+            </div>
         </div>
-    </footer>
+    </div>
+</footer>
 </body>
 </html>

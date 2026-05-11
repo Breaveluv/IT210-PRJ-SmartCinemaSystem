@@ -8,6 +8,7 @@ import com.example.smartcinemabookingsystem.model.User;
 import com.example.smartcinemabookingsystem.repository.ShowtimeRepository;
 import com.example.smartcinemabookingsystem.repository.TicketRepository;
 import com.example.smartcinemabookingsystem.service.BookingService;
+import com.example.smartcinemabookingsystem.service.ShowtimeService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 public class BookingController {
 
     private final BookingService bookingService;
+    private final ShowtimeService showtimeService;
     private final ShowtimeRepository showtimeRepository;
     private final TicketRepository ticketRepository;
 
@@ -40,8 +41,14 @@ public class BookingController {
             return "redirect:/login";
         }
 
-        Showtime showtime = showtimeRepository.findById(showtimeId).orElse(null);
+        Showtime showtime = showtimeService.getShowtimeById(showtimeId).orElse(null);
         if (showtime == null) return "redirect:/";
+        if (showtime.isStarted()) {
+            return "redirect:/movie/" + showtime.getMovie().getId();
+        }
+        if (showtime.isSoldOut()) {
+            return "redirect:/movie/" + showtime.getMovie().getId();
+        }
 
         List<Seat> seats = bookingService.getAvailableSeats(showtimeId);
         // We no longer need to fetch bookedSeatIds here, as the JS will handle it
@@ -66,18 +73,14 @@ public class BookingController {
 
     @PostMapping("/confirm")
     public String confirmBooking(@RequestParam Long showtimeId, 
-                                 @RequestParam String seatIds, 
+                                 @RequestParam(value = "seatIds", required = false) List<Long> seatIds, 
                                  HttpSession session, 
                                  RedirectAttributes redirectAttributes) {
         User user = (User) session.getAttribute("loggedInUser");
         if (user == null) return "redirect:/login";
 
         try {
-            List<Long> seatIdList = Arrays.stream(seatIds.split(","))
-                    .map(Long::parseLong)
-                    .collect(Collectors.toList());
-            
-            Booking booking = bookingService.createBooking(user, showtimeId, seatIdList);
+            Booking booking = bookingService.createBooking(user, showtimeId, seatIds);
             redirectAttributes.addFlashAttribute("booking", booking);
             return "redirect:/booking/success";
         } catch (BookingConflictException e) {

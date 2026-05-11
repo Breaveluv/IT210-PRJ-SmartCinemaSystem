@@ -23,6 +23,10 @@
                 <h5 class="mb-0">Thông tin tài khoản</h5>
             </div>
             <div class="card-body">
+                <div class="alert alert-info">
+                    <strong th:text="${profileType}">Profile</strong>
+                    <span th:text="${' - ' + profileDescription}"></span>
+                </div>
                 <div class="row mb-3">
                     <div class="col-md-4 text-muted">Tên đăng nhập:</div>
                     <div class="col-md-8" th:text="${user.username}"></div>
@@ -44,6 +48,7 @@
                     <div class="col-md-8" th:text="${user.role}"></div>
                 </div>
                 <hr>
+                <a th:href="${primaryActionUrl}" class="btn btn-outline-dark ms-2" th:text="${primaryActionLabel}">Tac vu</a>
                 <a th:href="@{/profile/edit}" class="btn btn-primary">Chỉnh sửa hồ sơ</a>
             </div>
         </div>

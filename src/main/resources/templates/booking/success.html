@@ -1,41 +1,42 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/header :: header-css}">
-    <title>Đặt vé thành công - Smart Cinema</title>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head(pageTitle='Đặt vé thành công - CinemaMax')}">
 </head>
 <body>
-    <div th:replace="~{fragments/header :: navbar}"></div>
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
 
-    <div class="container mt-4">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card shadow-sm text-center">
-                    <div class="card-header bg-success text-white">
-                        <h4 class="mb-0 py-2">Đặt vé thành công!</h4>
-                    </div>
-                    <div class="card-body p-4">
-                        <p class="lead">Cảm ơn bạn đã đặt vé tại Smart Cinema.</p>
-                        <p>Mã đặt vé của bạn là: <strong th:text="${booking.id}">#BOOKING123</strong></p>
-                        <p>Tổng số tiền: <strong th:text="${#numbers.formatDecimal(booking.totalAmount, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}">150,000 VNĐ</strong></p>
-                        <p>Thời gian đặt: <span th:text="${#temporals.format(booking.bookingTime, 'HH:mm dd/MM/yyyy')}"></span></p>
+<div class="container mt-5 pt-5"> <!-- Added pt-5 for fixed navbar -->
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg bg-dark text-white border-secondary text-center">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0 py-2 fw-bold"><i class="fa-solid fa-circle-check me-2"></i>Đặt vé thành công!</h4>
+                </div>
+                <div class="card-body p-4">
+                    <p class="lead text-secondary">Cảm ơn bạn đã đặt vé tại CinemaMax.</p>
+                    <p class="mb-1">Mã đặt vé của bạn là: <strong class="text-primary" th:text="${booking.id}">#BOOKING123</strong></p>
+                    <p class="mb-1">Tổng số tiền: <strong class="text-danger fs-5" th:text="${#numbers.formatDecimal(booking.totalAmount, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}">150,000 VNĐ</strong></p>
+                    <p class="mb-4">Thời gian đặt: <span class="text-secondary" th:text="${#temporals.format(booking.bookingTime, 'HH:mm dd/MM/yyyy')}"></span></p>
 
-                        <h5 class="mt-4">Chi tiết vé:</h5>
-                        <ul class="list-group list-group-flush mb-4">
-                            <li class="list-group-item" th:each="ticket : ${booking.tickets}">
-                                Phim: <strong th:text="${ticket.showtime.movie.title}"></strong> -
-                                Suất chiếu: <span th:text="${#temporals.format(ticket.showtime.startTime, 'HH:mm dd/MM/yyyy')}"></span> -
-                                Phòng: <span th:text="${ticket.showtime.room.name}"></span> -
-                                Ghế: <strong th:text="${ticket.seat.seatName}"></strong>
-                            </li>
-                        </ul>
+                    <h5 class="mt-4 fw-bold text-primary">Chi tiết vé:</h5>
+                    <ul class="list-group list-group-flush mb-4 bg-dark">
+                        <li class="list-group-item bg-dark text-white border-secondary" th:each="ticket : ${booking.tickets}">
+                            Phim: <strong th:text="${ticket.showtime.movie.title}"></strong> <br>
+                            Suất chiếu: <span th:text="${#temporals.format(ticket.showtime.startTime, 'HH:mm dd/MM/yyyy')}"></span> <br>
+                            Phòng: <span th:text="${ticket.showtime.room.name}"></span> <br>
+                            Ghế: <strong class="text-primary" th:text="${ticket.seat.seatName}"></strong>
+                        </li>
+                    </ul>
 
-                        <a th:href="@{/booking/history}" class="btn btn-primary me-2">Xem lịch sử đặt vé</a>
-                        <a th:href="@{/}" class="btn btn-outline-secondary">Về trang chủ</a>
-                    </div>
+                    <a th:href="@{/booking/history}" class="btn btn-primary me-2"><i class="fa-solid fa-receipt me-2"></i>Xem lịch sử đặt vé</a>
+                    <a th:href="@{/}" class="btn btn-outline-secondary"><i class="fa-solid fa-house me-2"></i>Về trang chủ</a>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<div th:replace="~{fragments/scripts :: scripts}"></div>
 </body>
 </html>

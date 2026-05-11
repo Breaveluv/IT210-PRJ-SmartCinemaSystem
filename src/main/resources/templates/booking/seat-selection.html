@@ -1,96 +1,63 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/header :: header-css}">
-    <title>Chọn ghế - Smart Cinema</title>
-</head>
+<head th:replace="~{fragments/header :: head(pageTitle='Chọn ghế')}"></head>
 <body>
-    <div th:replace="~{fragments/header :: navbar}"></div>
+<nav th:replace="~{fragments/header :: navbar}"></nav>
 
-    <div class="container mt-4">
-        <div class="row">
-            <div class="col-md-8">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-dark text-white">
-                        <h5 class="mb-0">Sơ đồ ghế - <span th:text="${showtime.room.name}"></span></h5>
+<div class="container mt-5">
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+    <div th:if="${showtime.soldOut}" class="alert alert-warning">Het ve cho suat chieu nay.</div>
+
+    <form th:action="@{/booking/confirm}" method="post">
+        <input type="hidden" name="showtimeId" th:value="${showtime.id}">
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="glass-card p-5 text-center">
+                    <div class="screen"></div>
+
+                    <!-- Lưới ghế ngồi -->
+                    <div class="mx-auto" style="max-width: 600px;">
+                        <div th:if="${#lists.isEmpty(seats)}" class="alert alert-warning">
+                            Suất chiếu này chưa có ghế khả dụng. Vui lòng kiểm tra lại cấu hình phòng chiếu.
+                        </div>
+                        <th:block th:each="seat : ${seats}">
+                            <input type="checkbox" name="seatIds"
+                                   th:value="${seat.id}"
+                                   th:id="'s-' + ${seat.id}"
+                                   th:disabled="${#lists.contains(bookedSeatIds, seat.id)}"
+                                   class="seat-checkbox">
+                            <label th:for="'s-' + ${seat.id}" class="seat-label" th:text="${seat.seatName}"></label>
+                        </th:block>
                     </div>
-                    <div class="card-body">
-                        <div class="screen text-center bg-secondary text-white py-2 mb-5 rounded">MÀN HÌNH</div>
 
-                        <div class="seat-container d-flex flex-wrap justify-content-center">
-                            <div th:each="seat : ${seats}" class="m-1 text-center">
-                                <button type="button"
-                                        th:id="'seat-' + ${seat.id}"
-                                        th:classappend="${#lists.contains(bookedSeatIds, seat.id)} ? 'btn-danger disabled' : 'btn-outline-success'"
-                                        class="btn btn-sm seat-btn"
-                                        th:text="${seat.seatName}"
-                                        th:onclick="'toggleSeat(' + ${seat.id} + ')'"
-                                        style="width: 45px; height: 45px;">
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 d-flex justify-content-center gap-4">
-                            <div><span class="badge bg-outline-success border border-success text-success">&nbsp;&nbsp;</span> Trống</div>
-                            <div><span class="badge bg-danger">&nbsp;&nbsp;</span> Đã đặt</div>
-                            <div><span class="badge bg-success">&nbsp;&nbsp;</span> Đang chọn</div>
-                        </div>
+                    <div class="mt-5 d-flex justify-content-center gap-4 small text-secondary">
+                        <span><i class="fa-solid fa-square me-1" style="color:#2d3436"></i> Trống</span>
+                        <span><i class="fa-solid fa-square me-1 text-primary"></i> Đang chọn</span>
+                        <span><i class="fa-solid fa-square me-1 opacity-25"></i> Đã đặt</span>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white text-center">
-                        <h5 class="mb-0">Thông tin vé</h5>
+            <div class="col-lg-4">
+                <div class="glass-card p-4 sticky-top" style="top: 100px;">
+                    <h4 class="fw-bold mb-4">THÔNG TIN VÉ</h4>
+                    <h5 class="text-primary fw-bold" th:text="${showtime.movie.title}"></h5>
+                    <p class="text-secondary small">
+                        <span th:text="${showtime.room.name}"></span><br>
+                        <span th:text="${#temporals.format(showtime.startTime, 'HH:mm dd/MM/yyyy')}"></span>
+                    </p>
+                    <div class="bg-dark p-3 rounded-3 mb-4">
+                        <span class="text-secondary small">Giá vé niêm yết:</span>
+                        <div class="fw-bold fs-5 text-white" th:text="${#numbers.formatDecimal(showtime.price, 0, 'COMMA', 0, 'POINT')} + ' đ/vé'"></div>
                     </div>
-                    <div class="card-body">
-                        <h6 th:text="${showtime.movie.title}">Tên phim</h6>
-                        <p class="small text-muted mb-1">
-                            Suất chiếu: <strong th:text="${#temporals.format(showtime.startTime, 'HH:mm dd/MM/yyyy')}"></strong>
-                        </p>
-                        <p class="small text-muted">Phòng: <span th:text="${showtime.room.name}"></span></p>
-                        <hr>
-                        <p>Ghế đã chọn: <span id="selected-seats-text" class="fw-bold text-success">Chưa chọn</span></p>
-                        <h4 class="text-danger">Tổng: <span id="total-price">0</span> VNĐ</h4>
 
-                        <form th:action="@{/booking/confirm}" method="post" id="booking-form">
-                            <input type="hidden" name="showtimeId" th:value="${showtime.id}">
-                            <input type="hidden" name="seatIds" id="seatIdsInput">
-                            <button type="submit" class="btn btn-success w-100 mt-3" id="confirm-btn" disabled>Xác nhận đặt vé</button>
-                        </form>
-                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold" th:disabled="${#lists.isEmpty(seats) or showtime.soldOut}">XÁC NHẬN CHỌN GHẾ</button>
+                    <p class="text-center text-secondary small mt-3 italic">* Vui lòng chọn ghế trước khi nhấn xác nhận</p>
                 </div>
             </div>
         </div>
-    </div>
-
-    <script th:inline="javascript">
-        let selectedSeats = [];
-        const pricePerSeat = [[${showtime.price}]];
-
-        function toggleSeat(seatId) {
-            const btn = document.getElementById('seat-' + seatId);
-            if (btn.classList.contains('disabled')) return;
-
-            const index = selectedSeats.indexOf(seatId);
-            if (index > -1) {
-                selectedSeats.splice(index, 1);
-                btn.classList.replace('btn-success', 'btn-outline-success');
-            } else {
-                selectedSeats.push(seatId);
-                btn.classList.replace('btn-outline-success', 'btn-success');
-            }
-            updateSummary();
-        }
-
-        function updateSummary() {
-            const text = selectedSeats.length > 0 ? selectedSeats.length + ' ghế' : 'Chưa chọn';
-            document.getElementById('selected-seats-text').innerText = text;
-            document.getElementById('total-price').innerText = (selectedSeats.length * pricePerSeat).toLocaleString();
-            document.getElementById('seatIdsInput').value = selectedSeats.join(',');
-            document.getElementById('confirm-btn').disabled = selectedSeats.length === 0;
-        }
-    </script>
-
+    </form>
+</div>
 </body>
 </html>

@@ -26,6 +26,7 @@ public class BookingService {
     private final ShowtimeRepository showtimeRepository;
     private final SeatRepository seatRepository;
     private final TicketRepository ticketRepository;
+    private final RoomService roomService;
 
     // Thời gian tối thiểu trước suất chiếu để cho phép hủy vé (ví dụ: 24 giờ)
     private static final int MIN_HOURS_TO_CANCEL = 24;
@@ -48,14 +49,42 @@ public class BookingService {
 
     public List<Seat> getAvailableSeats(Long showtimeId) {
         Showtime showtime = showtimeRepository.findById(showtimeId).orElseThrow();
-        return seatRepository.findByRoomId(showtime.getRoom().getId());
+        roomService.ensureSeatCount(showtime.getRoom());
+        List<Seat> roomSeats = seatRepository.findByRoomIdOrderByIdAsc(showtime.getRoom().getId());
+        Integer customTotalSeats = showtime.getCustomTotalSeats();
+
+        if (customTotalSeats != null && customTotalSeats > 0 && customTotalSeats < roomSeats.size()) {
+            return roomSeats.subList(0, customTotalSeats);
+        }
+
+        return roomSeats;
     }
 
     @Transactional
     public Booking createBooking(User user, Long showtimeId, List<Long> seatIds) {
         Showtime showtime = showtimeRepository.findById(showtimeId).orElseThrow();
+        if (!showtime.getStartTime().isAfter(LocalDateTime.now())) {
+            throw new IllegalStateException("Suat chieu da qua gio, khong the dat ve.");
+        }
+        long bookedSeats = ticketRepository.countByShowtimeIdAndBookingStatusNot(showtimeId, Booking.BookingStatus.CANCELLED);
+        long effectiveTotalSeats = showtime.getCustomTotalSeats() != null && showtime.getCustomTotalSeats() > 0
+                ? showtime.getCustomTotalSeats()
+                : showtime.getRoom().getTotalSeats();
+        if (bookedSeats >= effectiveTotalSeats) {
+            throw new IllegalStateException("Suat chieu da het ve.");
+        }
+        if (seatIds == null || seatIds.isEmpty()) {
+            throw new IllegalArgumentException("Vui long chon it nhat mot ghe.");
+        }
+
+        List<Long> validSeatIds = getAvailableSeats(showtimeId).stream()
+                .map(Seat::getId)
+                .toList();
 
         for (Long seatId : seatIds) {
+            if (!validSeatIds.contains(seatId)) {
+                throw new IllegalArgumentException("Ghe da chon khong nam trong so luong ghe cua suat chieu nay.");
+            }
             // Check if the seat is already booked for this showtime and not cancelled
             if (ticketRepository.existsByShowtimeIdAndSeatIdAndBookingStatusNot(showtimeId, seatId, Booking.BookingStatus.CANCELLED)) {
                 Seat seat = seatRepository.findById(seatId).orElseThrow(() -> new IllegalArgumentException("Ghế không tồn tại"));

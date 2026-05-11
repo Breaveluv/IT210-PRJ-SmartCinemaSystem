@@ -36,4 +36,24 @@ public class Showtime {
     // Trường mới để cho phép tùy chỉnh số ghế cho suất chiếu
     // Sử dụng Integer để có thể là null nếu không muốn tùy chỉnh
     private Integer customTotalSeats;
+
+    @Transient
+    private boolean soldOut;
+
+    @Transient
+    private boolean started;
+
+    @Transient
+    private String statusLabel;
+
+    public Showtime(Long id, Movie movie, Room room, LocalDateTime startTime, LocalDateTime endTime,
+                    double price, Integer customTotalSeats) {
+        this.id = id;
+        this.movie = movie;
+        this.room = room;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.price = price;
+        this.customTotalSeats = customTotalSeats;
+    }
 }

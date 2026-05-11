@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/header :: header-css}">
+<head th:replace="~{fragments/header :: head('Danh sach phim - Smart Cinema')}">
     <title>Danh sách phim - Smart Cinema</title>
 </head>
 <body>
@@ -18,9 +18,9 @@
                         <h5 class="card-title text-truncate" th:text="${movie.title}">Tên phim</h5>
                         <p class="card-text text-muted small">
                             <span th:each="genre, iterStat : ${movie.genres}"
-                                  th:text="${genre.name} + ${!iterStat.last ? ', ' : ''}"></span>
+                                  th:text="${genre.name + (!iterStat.last ? ', ' : '')}"></span>
                         </p>
-                        <a th:href="@{'/movies/' + ${movie.id}}" class="btn btn-primary w-100">Xem chi tiết</a>
+                        <a th:href="@{'/movie/' + ${movie.id}}" class="btn btn-primary w-100">Xem chi tiết</a>
                     </div>
                 </div>
             </div>

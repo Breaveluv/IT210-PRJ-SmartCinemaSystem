@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">CINEMAMAX</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto font-weight-bold">
+                    <li class="nav-item"><a class="nav-link px-3" href="/">TRANG CHỦ</a></li>
+                    <li class="nav-item"><a class="nav-link px-3" href="#">LỊCH CHIẾU</a></li>
+                    <li class="nav-item"><a class="nav-link px-3" href="#">KHUYẾN MÃI</a></li>
+
+                    <!-- Login/Register or User Dropdown -->
+                    <li class="nav-item" th:if="${session.loggedInUser == null}">
+                        <a class="btn btn-primary ms-lg-3" href="/login">ĐĂNG NHẬP</a>
+                    </li>
+                    <li class="nav-item dropdown" th:if="${session.loggedInUser != null}">
+                        <a class="nav-link dropdown-toggle btn btn-primary ms-lg-3" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Xin chào, <span th:text="${session.loggedInUser.username}"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="/profile">Hồ sơ</a></li>
+                            <li><a class="dropdown-item" href="/booking/history">Lịch sử đặt vé</a></li>
+                            <li th:if="${session.loggedInUser != null and session.loggedInUser.role == T(com.example.smartcinemabookingsystem.model.User$Role).ADMIN}">
+                                <a class="dropdown-item" href="/admin/dashboard">Admin Dashboard</a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</body>
+</html>

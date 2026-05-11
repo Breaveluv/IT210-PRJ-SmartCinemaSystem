@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/admin_layout :: adminHead(pageTitle=${room.id == null ? 'Thêm phòng chiếu' : 'Sửa phòng chiếu'})}"></head>
+<body>
+    <div th:replace="~{fragments/admin_layout :: sidebar(active='rooms')}"></div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <h2 th:text="${room.id == null ? 'Thêm phòng chiếu' : 'Sửa phòng chiếu'}"></h2>
+        </div>
+
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-card">
+                    <form th:action="@{/admin/rooms/save}" th:object="${room}" method="post">
+                        <input type="hidden" th:field="*{id}">
+
+                        <div class="mb-3">
+                            <label class="form-label">Tên phòng</label>
+                            <input type="text" th:field="*{name}" class="form-control" placeholder="Ví dụ: Phòng 01" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Tổng số ghế</label>
+                            <input type="number" th:field="*{totalSeats}" class="form-control" min="1" required>
+                            <small class="text-muted">Khi tăng số ghế, hệ thống sẽ tự tạo thêm ghế theo dạng A1, A2...</small>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-accent">
+                                <i class="fa-solid fa-save me-2"></i> Lưu
+                            </button>
+                            <a th:href="@{/admin/rooms}" class="btn btn-secondary">
+                                <i class="fa-solid fa-times me-2"></i> Hủy
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -24,7 +24,7 @@ public class HomeController {
     public String home(@RequestParam(defaultValue = "0") int page, 
                        @RequestParam(defaultValue = "8") int size, 
                        Model model) {
-        Page<Movie> moviePage = movieService.getPaginatedMovies(page, size);
+        Page<Movie> moviePage = movieService.getPaginatedMoviesWithFutureShowtimes(page, size);
         model.addAttribute("movies", moviePage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", moviePage.getTotalPages());

@@ -39,7 +39,8 @@ public class MovieController {
             return "redirect:/movie";
         }
         model.addAttribute("movie", movie);
-        model.addAttribute("showtimes", showtimeService.getShowtimesByMovieId(id));
+        // CORE-09: Display only future showtimes (greater than current time)
+        model.addAttribute("showtimes", showtimeService.getFutureShowtimesByMovieId(id));
         return "movies/details";
     }
 }

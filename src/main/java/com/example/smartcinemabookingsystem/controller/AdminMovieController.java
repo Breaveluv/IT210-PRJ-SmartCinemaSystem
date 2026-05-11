@@ -9,6 +9,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.HashSet;
+import java.util.List;
+
 @Controller
 @RequestMapping("/admin/movies")
 @RequiredArgsConstructor
@@ -31,8 +34,17 @@ public class AdminMovieController {
     }
 
     @PostMapping("/save")
-    public String saveMovie(@ModelAttribute Movie movie, RedirectAttributes redirectAttributes) {
+    public String saveMovie(@ModelAttribute Movie movie,
+                            @RequestParam(value = "genreIds", required = false) List<Long> genreIds,
+                            RedirectAttributes redirectAttributes) {
         try {
+            var genres = new HashSet<>(genreIds == null
+                    ? List.of()
+                    : genreIds.stream()
+                            .map(id -> genreService.getGenreById(id)
+                                    .orElseThrow(() -> new IllegalArgumentException("The loai khong ton tai: " + id)))
+                            .toList());
+            movie.setGenres(genres);
             movieService.saveMovie(movie);
             redirectAttributes.addFlashAttribute("successMessage", "Phim đã được lưu thành công!");
         } catch (Exception e) {
