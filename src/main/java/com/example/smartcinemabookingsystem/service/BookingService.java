@@ -47,6 +47,13 @@ public class BookingService {
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn đặt vé với ID: " + id));
     }
 
+    @Transactional
+    public void updateBookingStatus(Long bookingId, Booking.BookingStatus status) {
+        Booking booking = getBookingById(bookingId);
+        booking.setStatus(status);
+        bookingRepository.save(booking);
+    }
+
     public List<Seat> getAvailableSeats(Long showtimeId) {
         Showtime showtime = showtimeRepository.findById(showtimeId).orElseThrow();
         roomService.ensureSeatCount(showtime.getRoom());

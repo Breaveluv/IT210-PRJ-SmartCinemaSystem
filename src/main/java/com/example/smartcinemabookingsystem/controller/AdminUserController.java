@@ -31,8 +31,7 @@ public class AdminUserController {
     @PostMapping("/save")
     public String saveUser(@ModelAttribute User user, RedirectAttributes redirectAttributes) {
         try {
-            // In a real app, you'd handle password hashing here if it's a new user or password change
-            // For now, we're saving it as is (not recommended for production)
+
             userService.saveUser(user);
             redirectAttributes.addFlashAttribute("successMessage", "Người dùng đã được lưu thành công!");
         } catch (Exception e) {

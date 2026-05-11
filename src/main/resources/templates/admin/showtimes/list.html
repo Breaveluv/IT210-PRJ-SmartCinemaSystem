@@ -50,8 +50,7 @@
                             <a th:href="@{|/admin/showtimes/edit/${showtime.id}|}" class="btn btn-sm btn-outline-warning">
                                 <i class="fa-solid fa-edit"></i> Sửa
                             </a>
-                            <a th:href="@{|/admin/showtimes/delete/${showtime.id}|}" class="btn btn-sm btn-outline-danger"
-                               onclick="return confirm('Xóa suất chiếu này?');">
+                            <a th:href="@{|/admin/showtimes/delete/${showtime.id}|}" class="btn btn-sm btn-outline-danger">
                                 <i class="fa-solid fa-trash"></i> Xóa
                             </a>
                         </td>
@@ -63,7 +62,5 @@
             </table>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

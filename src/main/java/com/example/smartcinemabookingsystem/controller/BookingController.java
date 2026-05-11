@@ -51,9 +51,7 @@ public class BookingController {
         }
 
         List<Seat> seats = bookingService.getAvailableSeats(showtimeId);
-        // We no longer need to fetch bookedSeatIds here, as the JS will handle it
-        // and the service layer will do the final check.
-        // For display purposes, we might want to fetch actively booked seats.
+
         List<Long> bookedSeatIds = ticketRepository.findByShowtimeId(showtimeId)
                 .stream()
                 .filter(ticket -> ticket.getBooking().getStatus() != Booking.BookingStatus.CANCELLED)

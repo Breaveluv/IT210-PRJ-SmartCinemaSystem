@@ -54,7 +54,6 @@
             margin-bottom:54px;
             letter-spacing:-1px;
         }
-
         .logo span{
             color:#ff4d6d;
         }
@@ -108,14 +107,12 @@
             align-items:center;
             margin-bottom:30px;
         }
-
         .topbar h2{
             color:white;
             font-weight:700;
             font-size:40px;
             letter-spacing:0;
         }
-
         .topbar p{
             color:#94a3b8;
         }
@@ -160,7 +157,6 @@
                 font-size:30px;
             }
         }
-
     </style>
 
 </head>
@@ -208,7 +204,6 @@
         <i class="fa-solid fa-ticket"></i>
         Bookings
     </a>
-
     <a th:href="@{/admin/users}" th:classappend="${param.page == 'users' ? 'active' : ''}">
         <i class="fa-solid fa-users"></i>
         Users
@@ -246,7 +241,7 @@
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<div th:replace="~{fragments/scripts :: scripts}"></div>
 </body>
 </html>

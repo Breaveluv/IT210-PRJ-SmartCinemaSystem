@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/header :: header-css}">
+<head th:replace="~{fragments/header :: head(pageTitle='Ho so ca nhan - Smart Cinema')}">
     <title>Hồ sơ cá nhân - Smart Cinema</title>
 </head>
 <body>
@@ -48,7 +48,7 @@
                     <div class="col-md-8" th:text="${user.role}"></div>
                 </div>
                 <hr>
-                <a th:href="${primaryActionUrl}" class="btn btn-outline-dark ms-2" th:text="${primaryActionLabel}">Tac vu</a>
+                <a th:href="@{${primaryActionUrl}}" class="btn btn-outline-dark ms-2" th:text="${primaryActionLabel}">Tac vu</a>
                 <a th:href="@{/profile/edit}" class="btn btn-primary">Chỉnh sửa hồ sơ</a>
             </div>
         </div>

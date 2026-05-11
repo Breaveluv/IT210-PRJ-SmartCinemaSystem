@@ -1,5 +1,6 @@
 package com.example.smartcinemabookingsystem.controller;
 
+import com.example.smartcinemabookingsystem.model.Booking;
 import com.example.smartcinemabookingsystem.service.BookingService;
 import com.example.smartcinemabookingsystem.service.MovieService;
 import com.example.smartcinemabookingsystem.service.ShowtimeService;
@@ -9,7 +10,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/admin")
@@ -60,6 +63,20 @@ public class AdminController {
         var booking = bookingService.getBookingById(id);
         model.addAttribute("booking", booking);
         return "admin/bookings/detail";
+    }
+
+    @PostMapping("/bookings/{id}/confirm")
+    public String confirmBooking(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        bookingService.updateBookingStatus(id, Booking.BookingStatus.CONFIRMED);
+        redirectAttributes.addFlashAttribute("successMessage", "Da xac nhan don dat ve.");
+        return "redirect:/admin/bookings/" + id;
+    }
+
+    @PostMapping("/bookings/{id}/cancel")
+    public String cancelBooking(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        bookingService.updateBookingStatus(id, Booking.BookingStatus.CANCELLED);
+        redirectAttributes.addFlashAttribute("successMessage", "Da huy don dat ve.");
+        return "redirect:/admin/bookings/" + id;
     }
 
 }

@@ -1,10 +1,7 @@
 <!DOCTYPE html>
-<html lang="vi"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{admin/layout(param=page:'showtimes')}">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 
-<head>
+<head th:replace="~{fragments/admin_layout :: adminHead(pageTitle='Chi tiet suat chieu')}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Showtime Detail - Cinema Booking</title>
@@ -300,8 +297,9 @@
 </head>
 
 <body>
+<div th:replace="~{fragments/admin_layout :: sidebar(active='showtimes')}"></div>
 
-<div layout:fragment="content">
+<div class="main-content">
 
     <!-- HEADER -->
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -310,7 +308,7 @@
             <p class="text-muted mb-0 mt-2">CORE-08: Quản lý trạng thái suất chiếu và tình hình đặt vé</p>
         </div>
 
-        <a href="#" class="btn btn-secondary fw-bold d-inline-flex align-items-center gap-2">
+        <a th:href="@{/admin/showtimes}" class="btn btn-secondary fw-bold d-inline-flex align-items-center gap-2">
             <i class="fa-solid fa-arrow-left"></i>
             Quay lại
         </a>
@@ -393,7 +391,7 @@
 
                 <div class="seats-section">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="text-muted">Tình trạng ghế (Tổng: <span th:text="${showtime.room.totalSeats}">100</span> ghế)</span>
+                        <span class="text-muted">Tình trạng ghế (Tổng: <span th:text="${totalSeats}">100</span> ghế)</span>
                         <div class="d-flex gap-3">
                             <div class="d-flex align-items-center gap-2">
                                 <div class="seat-item seat-available" style="width:20px; height:20px;"></div>
@@ -408,7 +406,7 @@
 
                     <div class="seats-grid">
                         <!-- Mock seats data - in real app, this would come from showtime.seats -->
-                        <div th:each="i : ${#numbers.sequence(1, showtime.room.totalSeats)}"
+                        <div th:each="i : ${#numbers.sequence(1, totalSeats)}"
                              class="seat-item seat-available"
                              th:text="${i}">1</div>
                     </div>
@@ -420,18 +418,18 @@
                 <h4 class="text-white fw-bold mb-3">Danh sách đặt vé</h4>
 
                 <div class="bookings-list">
-                    <div th:if="${showtime.bookings.size() > 0}" th:each="booking : ${showtime.bookings}" class="booking-item">
+                    <div th:if="${!#lists.isEmpty(tickets)}" th:each="ticket : ${tickets}" class="booking-item">
                         <div class="booking-info">
-                            <h6 class="text-white mb-0" th:text="${booking.user.username}">Username</h6>
-                            <p class="text-muted mb-0" th:text="${#temporals.format(booking.createdAt, 'dd/MM/yyyy HH:mm')}">01/05/2026 14:30</p>
+                            <h6 class="text-white mb-0" th:text="${ticket.booking.user.username}">Username</h6>
+                            <p class="text-muted mb-0" th:text="${#temporals.format(ticket.booking.bookingTime, 'dd/MM/yyyy HH:mm')}">01/05/2026 14:30</p>
                         </div>
 
                         <div class="booking-seats">
-                            <span th:each="seat : ${booking.bookingSeats}" class="booking-seat" th:text="${seat.seat.seatNumber}">A1</span>
+                            <span class="booking-seat" th:text="${ticket.seat.seatName}">A1</span>
                         </div>
                     </div>
 
-                    <div th:if="${showtime.bookings.size() == 0}" class="text-center text-muted py-3">
+                    <div th:if="${#lists.isEmpty(tickets)}" class="text-center text-muted py-3">
                         <i class="fa-solid fa-ticket fs-2 d-block mb-2"></i>
                         <p>Chưa có booking nào</p>
                     </div>
@@ -450,22 +448,22 @@
                 <div class="stats-section">
                     <div class="stats-grid">
                         <div class="stat-item">
-                            <div class="stat-number text-success" th:text="${showtime.room.totalSeats - (showtime.bookings.size() * 3)}">80</div>
+                            <div class="stat-number text-success" th:text="${availableSeatCount}">80</div>
                             <div class="stat-label">Ghế trống</div>
                         </div>
 
                         <div class="stat-item">
-                            <div class="stat-number text-danger" th:text="${showtime.bookings.size() * 3}">20</div>
+                            <div class="stat-number text-danger" th:text="${bookedSeatCount}">20</div>
                             <div class="stat-label">Ghế đã đặt</div>
                         </div>
 
                         <div class="stat-item">
-                            <div class="stat-number text-info" th:text="${showtime.bookings.size()}">5</div>
+                            <div class="stat-number text-info" th:text="${#lists.size(bookings)}">5</div>
                             <div class="stat-label">Booking</div>
                         </div>
 
                         <div class="stat-item">
-                            <div class="stat-number text-warning" th:text="|${#numbers.formatDecimal((showtime.bookings.size() * 3 * 100.0) / showtime.room.totalSeats,1,1)}%|">20%</div>
+                            <div class="stat-number text-warning" th:text="|${#numbers.formatDecimal(occupancyRate,1,1)}%|">20%</div>
                             <div class="stat-label">Tỷ lệ lấp đầy</div>
                         </div>
                     </div>
@@ -478,7 +476,7 @@
 
                 <div class="stats-section">
                     <div class="text-center">
-                        <div class="stat-number text-success mb-2" th:text="|${#numbers.formatDecimal(showtime.bookings.size() * showtime.price * 3,1,0)} đ|">1,500,000 đ</div>
+                        <div class="stat-number text-success mb-2" th:text="|${#numbers.formatDecimal(revenue,1,0)} đ|">1,500,000 đ</div>
                         <div class="stat-label">Tổng doanh thu</div>
                     </div>
                 </div>
@@ -486,20 +484,20 @@
 
             <!-- ACTION BUTTONS -->
             <div class="action-buttons">
-                <a href="#" class="action-btn btn-back">
+                <a th:href="@{/admin/showtimes}" class="action-btn btn-back">
                     <i class="fa-solid fa-arrow-left"></i>
                     Quay lại
                 </a>
 
-                <a href="#" class="action-btn btn-edit">
+                <a th:href="@{|/admin/showtimes/edit/${showtime.id}|}" class="action-btn btn-edit">
                     <i class="fa-solid fa-pen"></i>
                     Sửa suất chiếu
                 </a>
 
-                <button type="button" class="action-btn btn-delete" onclick="deleteShowtime()">
+                <a th:href="@{|/admin/showtimes/delete/${showtime.id}|}" class="action-btn btn-delete">
                     <i class="fa-solid fa-trash"></i>
                     Xóa suất chiếu
-                </button>
+                </a>
             </div>
 
         </div>
@@ -507,15 +505,6 @@
     </div>
 
 </div>
-
-<script>
-    function deleteShowtime() {
-        if (confirm('Bạn có chắc chắn muốn xóa suất chiếu này? Tất cả booking sẽ bị hủy.')) {
-            // TODO: Implement API call
-            console.log('Delete showtime');
-        }
-    }
-</script>
 
 </body>
 </html>

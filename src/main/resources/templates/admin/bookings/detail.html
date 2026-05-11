@@ -440,19 +440,15 @@
                 </a>
 
                 <th:block th:if="${booking.status.name() == 'PENDING'}">
-                    <button type="button"
-                            th:onclick="|confirmBooking(${booking.id})|"
-                            class="action-btn btn-confirm">
-                        Xác nhận thanh toán
-                    </button>
+                    <form th:action="@{|/admin/bookings/${booking.id}/confirm|}" method="post" style="flex:1;">
+                        <button type="submit" class="action-btn btn-confirm">Xác nhận thanh toán</button>
+                    </form>
                 </th:block>
 
                 <th:block th:if="${booking.status.name() != 'CANCELLED'}">
-                    <button type="button"
-                            th:onclick="|cancelBooking(${booking.id})|"
-                            class="action-btn btn-cancel">
-                        Hủy đơn đặt
-                    </button>
+                    <form th:action="@{|/admin/bookings/${booking.id}/cancel|}" method="post" style="flex:1;">
+                        <button type="submit" class="action-btn btn-cancel">Hủy đơn đặt</button>
+                    </form>
                 </th:block>
 
             </div>
@@ -462,23 +458,6 @@
     </div>
 
 </div>
-
-<!-- Scripts -->
-<script>
-    function confirmBooking(bookingId) {
-        if (confirm('Xác nhận thanh toán cho đơn đặt vé này?')) {
-            console.log('Confirm booking:', bookingId);
-            // TODO: Implement API call
-        }
-    }
-
-    function cancelBooking(bookingId) {
-        if (confirm('Bạn chắc chắn muốn hủy đơn? Ghế sẽ được giải phóng.')) {
-            console.log('Cancel booking:', bookingId);
-            // TODO: Implement API call
-        }
-    }
-</script>
 
 </body>
 </html>

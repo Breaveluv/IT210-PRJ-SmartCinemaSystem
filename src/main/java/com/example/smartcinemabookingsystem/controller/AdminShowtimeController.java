@@ -3,6 +3,9 @@ package com.example.smartcinemabookingsystem.controller;
 import com.example.smartcinemabookingsystem.exception.ShowtimeConflictException;
 import com.example.smartcinemabookingsystem.model.Movie;
 import com.example.smartcinemabookingsystem.model.Showtime;
+import com.example.smartcinemabookingsystem.model.Booking;
+import com.example.smartcinemabookingsystem.model.Ticket;
+import com.example.smartcinemabookingsystem.repository.TicketRepository;
 import com.example.smartcinemabookingsystem.service.MovieService;
 import com.example.smartcinemabookingsystem.service.RoomService;
 import com.example.smartcinemabookingsystem.service.ShowtimeService;
@@ -20,6 +23,7 @@ public class AdminShowtimeController {
     private final ShowtimeService showtimeService;
     private final MovieService movieService;
     private final RoomService roomService;
+    private final TicketRepository ticketRepository;
 
     @GetMapping
     public String listShowtimes(Model model) {
@@ -99,9 +103,36 @@ public class AdminShowtimeController {
     }
 
     @GetMapping("/{id}")
-    public String showtimeDetail(@PathVariable Long id, Model model) {
-        var showtime = showtimeService.getShowtimeById(id);
+    public String showtimeDetail(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+        Showtime showtime = showtimeService.getShowtimeById(id).orElse(null);
+        if (showtime == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Khong tim thay suat chieu.");
+            return "redirect:/admin/showtimes";
+        }
+
+        var tickets = ticketRepository.findByShowtimeId(id);
+        var bookings = tickets.stream()
+                .map(Ticket::getBooking)
+                .distinct()
+                .toList();
+        int totalSeats = showtime.getCustomTotalSeats() != null && showtime.getCustomTotalSeats() > 0
+                ? showtime.getCustomTotalSeats()
+                : showtime.getRoom().getTotalSeats();
+        long bookedSeatCount = tickets.stream()
+                .filter(ticket -> ticket.getBooking().getStatus() != Booking.BookingStatus.CANCELLED)
+                .count();
+
         model.addAttribute("showtime", showtime);
+        model.addAttribute("tickets", tickets);
+        model.addAttribute("bookings", bookings);
+        model.addAttribute("totalSeats", totalSeats);
+        model.addAttribute("bookedSeatCount", bookedSeatCount);
+        model.addAttribute("availableSeatCount", Math.max(0, totalSeats - bookedSeatCount));
+        model.addAttribute("occupancyRate", totalSeats == 0 ? 0 : (bookedSeatCount * 100.0) / totalSeats);
+        model.addAttribute("revenue", tickets.stream()
+                .filter(ticket -> ticket.getBooking().getStatus() != Booking.BookingStatus.CANCELLED)
+                .mapToDouble(Ticket::getPrice)
+                .sum());
         return "admin/showtimes/detail";
     }
 }
