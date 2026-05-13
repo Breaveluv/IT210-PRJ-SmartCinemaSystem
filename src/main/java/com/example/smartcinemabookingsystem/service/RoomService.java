@@ -36,7 +36,7 @@ public class RoomService {
             roomToSave = new Room();
         } else {
             roomToSave = roomRepository.findById(room.getId())
-                    .orElseThrow(() -> new IllegalArgumentException("Khong tim thay phong chieu."));
+                    .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy phòng chiếu."));
         }
 
         roomToSave.setName(room.getName().trim());
@@ -50,36 +50,42 @@ public class RoomService {
     @Transactional
     public void deleteRoom(Long id) {
         if (!roomRepository.existsById(id)) {
-            throw new IllegalArgumentException("Khong tim thay phong chieu.");
+            throw new IllegalArgumentException("Không tìm thấy phòng chiếu.");
         }
         if (!showtimeRepository.findByRoomId(id).isEmpty()) {
-            throw new IllegalStateException("Khong the xoa phong dang co suat chieu.");
+            throw new IllegalStateException("Không thể xóa phòng đang có suất chiếu.");
         }
         roomRepository.deleteById(id);
     }
 
     private void validateRoom(Room room) {
         if (room.getName() == null || room.getName().trim().isEmpty()) {
-            throw new IllegalArgumentException("Ten phong khong duoc de trong.");
+            throw new IllegalArgumentException("Tên phòng không được để trống.");
         }
         if (room.getTotalSeats() <= 0) {
-            throw new IllegalArgumentException("Tong so ghe phai lon hon 0.");
+            throw new IllegalArgumentException("Tổng số ghế phải lớn hơn 0.");
         }
+
+        roomRepository.findByName(room.getName().trim()).ifPresent(existingRoom -> {
+            if (room.getId() == null || !existingRoom.getId().equals(room.getId())) {
+                throw new IllegalArgumentException("Tên phòng đã tồn tại.");
+            }
+        });
     }
 
     @Transactional
     public void ensureSeatCount(Room room) {
         if (room == null || room.getId() == null) {
-            throw new IllegalArgumentException("Phong chieu khong hop le.");
+            throw new IllegalArgumentException("Phòng chiếu không hợp lệ.");
         }
 
         Room managedRoom = roomRepository.findById(room.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Khong tim thay phong chieu."));
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy phòng chiếu."));
         long currentSeatCount = seatRepository.countByRoomId(managedRoom.getId());
         int targetSeatCount = managedRoom.getTotalSeats();
 
         if (targetSeatCount < currentSeatCount) {
-            throw new IllegalArgumentException("Khong the giam so ghe thap hon so ghe da tao hien tai: " + currentSeatCount);
+            throw new IllegalArgumentException("Không thể giảm số ghế thấp hơn số ghế đã tạo hiện tại: " + currentSeatCount);
         }
 
         for (long index = currentSeatCount + 1; index <= targetSeatCount; index++) {

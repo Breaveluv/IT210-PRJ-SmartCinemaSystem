@@ -22,7 +22,6 @@
                         <th>Số vé</th>
                         <th>Tổng tiền</th>
                         <th>Trạng thái</th>
-                        <th>Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -45,11 +44,7 @@
                                 <span th:case="'CANCELLED'" class="badge bg-danger">Đã hủy</span>
                             </span>
                         </td>
-                        <td>
-                            <a th:href="@{|/admin/bookings/${booking.id}|}" class="btn btn-sm btn-outline-primary">
-                                <i class="fa-solid fa-eye"></i> Xem
-                            </a>
-                        </td>
+
                     </tr>
                     <tr th:if="${#lists.isEmpty(bookings)}">
                         <td colspan="7" class="text-center text-muted">Chưa có đơn đặt vé nào</td>

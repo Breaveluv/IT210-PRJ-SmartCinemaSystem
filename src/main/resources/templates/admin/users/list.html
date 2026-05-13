@@ -7,9 +7,7 @@
     <div class="main-content">
         <div class="topbar">
             <h2>Quản lý người dùng</h2>
-            <a th:href="@{/admin/users/new}" class="btn btn-accent">
-                <i class="fa-solid fa-plus me-2"></i> Thêm người dùng
-            </a>
+
         </div>
 
         <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
@@ -25,7 +23,7 @@
                         <th>Email</th>
                         <th>Điện thoại</th>
                         <th>Vai trò</th>
-                        <th>Hành động</th>
+
                     </tr>
                 </thead>
                 <tbody>
@@ -38,14 +36,7 @@
                         <td>
                             <span class="badge bg-success" th:text="${user.role}"></span>
                         </td>
-                        <td>
-                            <a th:href="@{/admin/users/edit/{id}(id=${user.id})}" class="btn btn-sm btn-outline-warning">
-                                <i class="fa-solid fa-edit"></i> Sửa
-                            </a>
-                            <a th:href="@{/admin/users/delete/{id}(id=${user.id})}" class="btn btn-sm btn-outline-danger">
-                                <i class="fa-solid fa-trash"></i> Xóa
-                            </a>
-                        </td>
+
                     </tr>
                     <tr th:if="${#lists.isEmpty(users)}">
                         <td colspan="7" class="text-center text-muted">Chưa có người dùng nào.</td>

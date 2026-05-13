@@ -29,18 +29,22 @@ public class AdminUserController {
     }
 
     @PostMapping("/save")
-    public String saveUser(@ModelAttribute User user, RedirectAttributes redirectAttributes) {
-        try {
+    public String saveUser(@jakarta.validation.Valid @ModelAttribute User user, 
+                          org.springframework.validation.BindingResult bindingResult, 
+                          org.springframework.ui.Model model,
+                          RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("roles", User.Role.values());
+            return "admin/users/form";
+        }
 
+        try {
             userService.saveUser(user);
             redirectAttributes.addFlashAttribute("successMessage", "Người dùng đã được lưu thành công!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi lưu người dùng: " + e.getMessage());
-            if (user.getId() == null) {
-                return "redirect:/admin/users/new";
-            } else {
-                return "redirect:/admin/users/edit/" + user.getId();
-            }
+            model.addAttribute("errorMessage", "Lỗi: " + e.getMessage());
+            model.addAttribute("roles", User.Role.values());
+            return "admin/users/form";
         }
         return "redirect:/admin/users";
     }

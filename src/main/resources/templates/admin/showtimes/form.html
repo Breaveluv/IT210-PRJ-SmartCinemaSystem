@@ -19,32 +19,33 @@
 
                         <div class="mb-3">
                             <label class="form-label">Phim</label>
-                            <select th:field="*{movie.id}" class="form-control" required>
+                            <select th:field="*{movie.id}" class="form-control" th:classappend="${#fields.hasErrors('movie.id')} ? 'is-invalid' : ''">
                                 <option value="">-- Chọn phim --</option>
-                                <option th:each="m : ${movies}" th:value="${m.id}" th:text="${m.title}"
-                                        th:selected="${showtime.movie != null ? showtime.movie.id == m.id : false}"></option>
+                                <option th:each="m : ${movies}" th:value="${m.id}" th:text="${m.title}"></option>
                             </select>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('movie.id')}" th:errors="*{movie.id}"></div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Phòng chiếu</label>
-                            <select th:field="*{room.id}" class="form-control" required>
+                            <select th:field="*{room.id}" class="form-control" th:classappend="${#fields.hasErrors('room.id')} ? 'is-invalid' : ''">
                                 <option value="">-- Chọn phòng --</option>
-                                <option th:each="r : ${rooms}" th:value="${r.id}" th:text="${r.name}"
-                                        th:selected="${showtime.room != null ? showtime.room.id == r.id : false}"></option>
+                                <option th:each="r : ${rooms}" th:value="${r.id}" th:text="${r.name}"></option>
                             </select>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('room.id')}" th:errors="*{room.id}"></div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Thời gian bắt đầu</label>
-                            <input type="datetime-local" th:field="*{startTime}" class="form-control"
-                                   th:attr="min=${#temporals.format(T(java.time.LocalDateTime).now(), 'yyyy-MM-dd\'T\'HH:mm')}" required>
+                            <input type="datetime-local" th:field="*{startTime}" class="form-control" required th:classappend="${#fields.hasErrors('startTime')} ? 'is-invalid' : ''">
                             <small class="text-muted">Thời gian phải lớn hơn hiện tại</small>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}"></div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Giá vé (VNĐ)</label>
-                            <input type="number" th:field="*{price}" class="form-control" min="0" required>
+                            <input type="number" th:field="*{price}" class="form-control" min="0" required th:classappend="${#fields.hasErrors('price')} ? 'is-invalid' : ''">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
                         </div>
 
                         <div class="d-flex gap-2">

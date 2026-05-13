@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-@RequestMapping("/movie") // Đã thay đổi từ "/movies" thành "/movie"
+@RequestMapping("/movie")
 @RequiredArgsConstructor
 public class MovieController {
 

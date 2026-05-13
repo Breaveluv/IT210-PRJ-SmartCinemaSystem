@@ -28,17 +28,20 @@ public class AdminRoomController {
     }
 
     @PostMapping("/save")
-    public String saveRoom(@ModelAttribute Room room, RedirectAttributes redirectAttributes) {
+    public String saveRoom(@jakarta.validation.Valid @ModelAttribute Room room, 
+                          org.springframework.validation.BindingResult bindingResult, 
+                          org.springframework.ui.Model model,
+                          RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            return "admin/rooms/form";
+        }
+
         try {
             roomService.saveRoom(room);
             redirectAttributes.addFlashAttribute("successMessage", "Phòng chiếu đã được lưu thành công!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi lưu phòng chiếu: " + e.getMessage());
-            if (room.getId() == null) {
-                return "redirect:/admin/rooms/new";
-            } else {
-                return "redirect:/admin/rooms/edit/" + room.getId();
-            }
+            model.addAttribute("errorMessage", "Lỗi: " + e.getMessage());
+            return "admin/rooms/form";
         }
         return "redirect:/admin/rooms";
     }

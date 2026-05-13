@@ -1,57 +1,59 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/header :: head(pageTitle='Ho so ca nhan - Smart Cinema')}">
-    <title>Hồ sơ cá nhân - Smart Cinema</title>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head(pageTitle='Hồ sơ cá nhân - CinemaMax')}">
 </head>
 <body>
-    <div th:replace="~{fragments/header :: navbar}"></div>
+<nav th:replace="~{fragments/header :: navbar}"></nav>
 
-    <div class="container mt-4">
-        <h2 class="mb-4">Hồ sơ cá nhân</h2>
+<div class="container mt-5 pt-5"> <!-- Added pt-5 for fixed navbar -->
+    <h2 class="mb-4 fw-bold text-white">Hồ sơ cá nhân</h2>
 
-        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
-            <span th:text="${successMessage}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show bg-dark text-success border-success" role="alert">
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show bg-dark text-danger border-danger" role="alert">
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="card shadow-lg bg-dark text-white border-secondary">
+        <div class="card-header bg-dark text-white border-secondary">
+            <h5 class="mb-0 fw-bold">Thông tin tài khoản</h5>
         </div>
-        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
-            <span th:text="${errorMessage}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-
-        <div class="card shadow-sm">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">Thông tin tài khoản</h5>
+        <div class="card-body">
+            <div class="alert alert-info bg-dark text-info border-info">
+                <strong th:text="${profileType}">Profile</strong>
+                <span th:text="${' - ' + profileDescription}"></span>
             </div>
-            <div class="card-body">
-                <div class="alert alert-info">
-                    <strong th:text="${profileType}">Profile</strong>
-                    <span th:text="${' - ' + profileDescription}"></span>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-4 text-muted">Tên đăng nhập:</div>
-                    <div class="col-md-8" th:text="${user.username}"></div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-4 text-muted">Email:</div>
-                    <div class="col-md-8" th:text="${user.email}"></div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-4 text-muted">Họ và tên:</div>
-                    <div class="col-md-8" th:text="${user.fullName}"></div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-4 text-muted">Số điện thoại:</div>
-                    <div class="col-md-8" th:text="${user.phone}"></div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-4 text-muted">Vai trò:</div>
-                    <div class="col-md-8" th:text="${user.role}"></div>
-                </div>
-                <hr>
-                <a th:href="@{${primaryActionUrl}}" class="btn btn-outline-dark ms-2" th:text="${primaryActionLabel}">Tac vu</a>
-                <a th:href="@{/profile/edit}" class="btn btn-primary">Chỉnh sửa hồ sơ</a>
+            <div class="row mb-3">
+                <div class="col-md-4 text-secondary">Tên đăng nhập:</div>
+                <div class="col-md-8" th:text="${user.username}"></div>
             </div>
+            <div class="row mb-3">
+                <div class="col-md-4 text-secondary">Email:</div>
+                <div class="col-md-8" th:text="${user.email}"></div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 text-secondary">Họ và tên:</div>
+                <div class="col-md-8" th:text="${user.fullName}"></div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 text-secondary">Số điện thoại:</div>
+                <div class="col-md-8" th:text="${user.phone}"></div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 text-secondary">Vai trò:</div>
+                <div class="col-md-8" th:text="${user.role}"></div>
+            </div>
+            <hr class="border-secondary">
+            <a th:href="@{${primaryActionUrl}}" class="btn btn-outline-light me-2" th:text="${primaryActionLabel}">Tac vu</a>
+            <a th:href="@{/profile/edit}" class="btn btn-primary">Chỉnh sửa hồ sơ</a>
         </div>
     </div>
+</div>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<div th:replace="~{fragments/scripts :: scripts}"></div>
 </body>
 </html>

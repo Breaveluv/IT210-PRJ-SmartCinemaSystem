@@ -3,7 +3,7 @@ package com.example.smartcinemabookingsystem.controller;
 import com.example.smartcinemabookingsystem.model.User;
 import com.example.smartcinemabookingsystem.service.UserService;
 import jakarta.servlet.http.HttpSession;
-import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.validation.BindingResult;
+import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequestMapping("/profile")
@@ -25,6 +27,10 @@ public class UserProfileController {
         if (loggedInUser == null) {
             return "redirect:/login";
         }
+        // Fetch the latest user data from DB to ensure it's up-to-date
+        loggedInUser = userService.getUserById(loggedInUser.getId())
+                                  .orElse(loggedInUser); // Fallback to session if not found (shouldn't happen)
+        session.setAttribute("loggedInUser", loggedInUser); // Update session with latest data
         model.addAttribute("user", loggedInUser);
         addRoleProfileAttributes(model, loggedInUser);
         return "profile/view";
@@ -36,30 +42,47 @@ public class UserProfileController {
         if (loggedInUser == null) {
             return "redirect:/login";
         }
+
+        // Fetch the latest user data from DB for editing
+        loggedInUser = userService.getUserById(loggedInUser.getId())
+                                  .orElse(loggedInUser);
         model.addAttribute("user", loggedInUser);
         addRoleProfileAttributes(model, loggedInUser);
         return "profile/edit";
     }
 
     @PostMapping("/update")
-    public String updateProfile(@ModelAttribute User user, HttpSession session, RedirectAttributes redirectAttributes) {
+    public String updateProfile(@Valid @ModelAttribute User user, BindingResult bindingResult, HttpSession session, RedirectAttributes redirectAttributes) {
         User loggedInUser = (User) session.getAttribute("loggedInUser");
         if (loggedInUser == null) {
             return "redirect:/login";
         }
-
-        // Update only allowed fields
-        loggedInUser.setFullName(user.getFullName());
-        loggedInUser.setEmail(user.getEmail());
-        loggedInUser.setPhone(user.getPhone());
-        // Password and username should have separate update forms for security
-
+        // Không cho phép đổi username qua form này
+        user.setId(loggedInUser.getId());
+        user.setUsername(loggedInUser.getUsername());
+        user.setRole(loggedInUser.getRole());
+        // Nếu có lỗi validate
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.user", bindingResult);
+            redirectAttributes.addFlashAttribute("user", user);
+            redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng kiểm tra lại thông tin!");
+            return "redirect:/profile/edit";
+        }
+        // Kiểm tra email đã tồn tại (và khác email hiện tại)
+        var emailOwner = userService.findByEmail(user.getEmail());
+        if (emailOwner.isPresent() && !emailOwner.get().getId().equals(loggedInUser.getId())) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Email đã được sử dụng bởi tài khoản khác!");
+            redirectAttributes.addFlashAttribute("user", user);
+            return "redirect:/profile/edit";
+        }
         try {
-            userService.updateUserProfile(loggedInUser);
-            session.setAttribute("loggedInUser", loggedInUser); // Update session with new data
+            User updatedUser = userService.updateUserProfile(user);
+            session.setAttribute("loggedInUser", updatedUser);
             redirectAttributes.addFlashAttribute("successMessage", "Cập nhật hồ sơ thành công!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi cập nhật hồ sơ: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("user", user);
+            return "redirect:/profile/edit";
         }
         return "redirect:/profile";
     }

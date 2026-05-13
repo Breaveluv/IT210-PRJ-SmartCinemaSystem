@@ -9,19 +9,31 @@
         <div class="col-md-5 col-lg-4">
             <div class="glass-card p-5">
                 <h3 class="fw-bold text-center mb-4">ĐĂNG NHẬP</h3>
-                <form th:action="@{/login}" method="post">
-                    <!-- Hiển thị lỗi từ Server -->
-                    <div th:if="${param.error}" class="alert alert-danger small border-0 bg-danger bg-opacity-10 py-2">
-                        Tài khoản hoặc mật khẩu không đúng.
-                    </div>
 
+                <!-- Hiển thị lỗi từ Server -->
+                <div th:if="${error}" class="alert alert-danger small border-0 bg-danger bg-opacity-10 py-2 mb-3" th:text="${error}"></div>
+                <div th:if="${param.error}" class="alert alert-danger small border-0 bg-danger bg-opacity-10 py-2 mb-3">
+                    Tài khoản hoặc mật khẩu không đúng.
+                </div>
+
+                <!-- Hiển thị thông báo success -->
+                <div th:if="${param.success}" class="alert alert-success small border-0 bg-success bg-opacity-10 py-2 mb-3">
+                    Đăng ký thành công! Vui lòng đăng nhập.
+                </div>
+
+                <!-- Hiển thị thông báo logout -->
+                <div th:if="${param.logout}" class="alert alert-info small border-0 bg-info bg-opacity-10 py-2 mb-3">
+                    Bạn đã đăng xuất thành công.
+                </div>
+
+                <form th:action="@{/login}" method="post">
                     <div class="mb-4">
                         <label class="small text-secondary mb-2">Tên đăng nhập</label>
-                        <input type="text" name="username" class="form-control bg-dark border-secondary text-white py-2 shadow-none">
+                        <input type="text" name="username" th:value="${username}" class="form-control bg-dark border-secondary text-white py-2 shadow-none" required>
                     </div>
                     <div class="mb-4">
                         <label class="small text-secondary mb-2">Mật khẩu</label>
-                        <input type="password" name="password" class="form-control bg-dark border-secondary text-white py-2 shadow-none">
+                        <input type="password" name="password" class="form-control bg-dark border-secondary text-white py-2 shadow-none" required>
                     </div>
                     <button type="submit" class="btn btn-primary w-100 py-3">TIẾP TỤC</button>
                 </form>

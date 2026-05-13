@@ -19,7 +19,7 @@
 
                         <div class="mb-3">
                             <label class="form-label">Phim</label>
-                            <select th:field="*{movie.id}" class="form-control" required>
+                            <select th:field="*{movie.id}" class="form-control">
                                 <option value="">-- Chọn phim --</option>
                                 <option th:each="m : ${movies}" th:value="${m.id}" th:text="${m.title}"
                                         th:selected="${showtime.movie != null ? showtime.movie.id == m.id : false}"></option>
@@ -28,7 +28,7 @@
 
                         <div class="mb-3">
                             <label class="form-label">Phòng chiếu</label>
-                            <select th:field="*{room.id}" class="form-control" required>
+                            <select th:field="*{room.id}" class="form-control">
                                 <option value="">-- Chọn phòng --</option>
                                 <option th:each="r : ${rooms}" th:value="${r.id}" th:text="${r.name}"
                                         th:selected="${showtime.room != null ? showtime.room.id == r.id : false}"></option>
@@ -62,4 +62,3 @@
     </div>
 </body>
 </html>
-

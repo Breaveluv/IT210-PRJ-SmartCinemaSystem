@@ -28,17 +28,20 @@ public class AdminGenreController {
     }
 
     @PostMapping("/save")
-    public String saveGenre(@ModelAttribute Genre genre, RedirectAttributes redirectAttributes) {
+    public String saveGenre(@jakarta.validation.Valid @ModelAttribute Genre genre, 
+                           org.springframework.validation.BindingResult bindingResult, 
+                           org.springframework.ui.Model model,
+                           RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            return "admin/genres/form";
+        }
+
         try {
             genreService.saveGenre(genre);
             redirectAttributes.addFlashAttribute("successMessage", "Thể loại đã được lưu thành công!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi lưu thể loại: " + e.getMessage());
-            if (genre.getId() == null) {
-                return "redirect:/admin/genres/new";
-            } else {
-                return "redirect:/admin/genres/edit/" + genre.getId();
-            }
+            model.addAttribute("errorMessage", "Lỗi: " + e.getMessage());
+            return "admin/genres/form";
         }
         return "redirect:/admin/genres";
     }

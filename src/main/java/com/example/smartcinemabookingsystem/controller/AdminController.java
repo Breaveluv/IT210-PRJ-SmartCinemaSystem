@@ -34,13 +34,13 @@ public class AdminController {
         model.addAttribute("totalUsers", userService.getAllUsers().size());
         model.addAttribute("totalBookings", allBookings.size());
 
-        // Calculate total revenue
+        // Tính tổng doanh thu
         double totalRevenue = allBookings.stream()
                 .mapToDouble(booking -> booking.getTotalAmount() != 0 ? booking.getTotalAmount() : 0)
                 .sum();
         model.addAttribute("totalRevenue", totalRevenue);
 
-        // Get recent bookings (last 5)
+        // Lấy 5 đơn đặt vé gần đây nhất
         var recentBookings = allBookings.stream()
                 .sorted((a, b) -> b.getBookingTime().compareTo(a.getBookingTime()))
                 .limit(5)
@@ -68,14 +68,14 @@ public class AdminController {
     @PostMapping("/bookings/{id}/confirm")
     public String confirmBooking(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         bookingService.updateBookingStatus(id, Booking.BookingStatus.CONFIRMED);
-        redirectAttributes.addFlashAttribute("successMessage", "Da xac nhan don dat ve.");
+        redirectAttributes.addFlashAttribute("successMessage", "Đã xác nhận đơn đặt vé.");
         return "redirect:/admin/bookings/" + id;
     }
 
     @PostMapping("/bookings/{id}/cancel")
     public String cancelBooking(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         bookingService.updateBookingStatus(id, Booking.BookingStatus.CANCELLED);
-        redirectAttributes.addFlashAttribute("successMessage", "Da huy don dat ve.");
+        redirectAttributes.addFlashAttribute("successMessage", "Đã hủy đơn đặt vé.");
         return "redirect:/admin/bookings/" + id;
     }
 

@@ -44,9 +44,7 @@
                             <span class="badge bg-success" th:text="${#numbers.formatDecimal(showtime.price, 0, 'COMMA', 0, 'POINT')} + ' VND'"></span>
                         </td>
                         <td>
-                            <a th:href="@{|/admin/showtimes/${showtime.id}|}" class="btn btn-sm btn-outline-primary">
-                                <i class="fa-solid fa-eye"></i> Xem
-                            </a>
+
                             <a th:href="@{|/admin/showtimes/edit/${showtime.id}|}" class="btn btn-sm btn-outline-warning">
                                 <i class="fa-solid fa-edit"></i> Sửa
                             </a>

@@ -20,32 +20,37 @@
 
                         <div class="mb-3">
                             <label class="form-label">Tài khoản</label>
-                            <input type="text" th:field="*{username}" class="form-control" required>
+                            <input type="text" th:field="*{username}" class="form-control" th:classappend="${#fields.hasErrors('username')} ? 'is-invalid' : ''">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Mật khẩu</label>
-                            <input type="password" th:field="*{password}" class="form-control" required>
+                            <input type="password" th:field="*{password}" class="form-control" th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Email</label>
-                            <input type="email" th:field="*{email}" class="form-control" required>
+                            <input type="email" th:field="*{email}" class="form-control" th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Họ tên</label>
-                            <input type="text" th:field="*{fullName}" class="form-control">
+                            <input type="text" th:field="*{fullName}" class="form-control" th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid' : ''">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Điện thoại</label>
-                            <input type="text" th:field="*{phone}" class="form-control">
+                            <input type="text" th:field="*{phone}" class="form-control" th:classappend="${#fields.hasErrors('phone')} ? 'is-invalid' : ''">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Vai trò</label>
-                            <select th:field="*{role}" class="form-control" required>
+                            <select th:field="*{role}" class="form-control">
                                 <option th:each="role : ${roles}" th:value="${role}" th:text="${role}"></option>
                             </select>
                         </div>

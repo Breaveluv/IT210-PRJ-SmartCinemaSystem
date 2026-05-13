@@ -20,12 +20,14 @@
 
                         <div class="mb-3">
                             <label class="form-label">Tên phòng</label>
-                            <input type="text" th:field="*{name}" class="form-control" placeholder="Ví dụ: Phòng 01" required>
+                            <input type="text" th:field="*{name}" class="form-control" placeholder="Ví dụ: Phòng 01" th:classappend="${#fields.hasErrors('name')} ? 'is-invalid' : ''">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Tổng số ghế</label>
-                            <input type="number" th:field="*{totalSeats}" class="form-control" min="1" required>
+                            <input type="number" th:field="*{totalSeats}" class="form-control"  th:classappend="${#fields.hasErrors('totalSeats')} ? 'is-invalid' : ''">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('totalSeats')}" th:errors="*{totalSeats}"></div>
                             <small class="text-muted">Khi tăng số ghế, hệ thống sẽ tự tạo thêm ghế theo dạng A1, A2...</small>
                         </div>
 
