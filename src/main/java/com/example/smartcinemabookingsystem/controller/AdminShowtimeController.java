@@ -36,8 +36,8 @@ public class AdminShowtimeController {
     @GetMapping("/new")
     public String newShowtimeForm(Model model) {
         model.addAttribute("showtime", new Showtime());
-        model.addAttribute("movies", movieService.getAllMovies()); // Cần load lại data cho dropdown
-        model.addAttribute("rooms", roomService.getAllRooms());   // Cần load lại data cho dropdown
+        model.addAttribute("movies", movieService.getAllMovies());
+        model.addAttribute("rooms", roomService.getAllRooms());
         return "admin/showtimes/form"; // Updated to use admin layout
     }
     // Lưu
@@ -123,7 +123,7 @@ public class AdminShowtimeController {
         return "redirect:/admin/showtimes";
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id:\\d+}")
     public String showtimeDetail(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         Showtime showtime = showtimeService.getShowtimeById(id).orElse(null);
         if (showtime == null) {

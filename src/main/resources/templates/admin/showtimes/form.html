@@ -37,14 +37,14 @@
 
                         <div class="mb-3">
                             <label class="form-label">Thời gian bắt đầu</label>
-                            <input type="datetime-local" th:field="*{startTime}" class="form-control" required th:classappend="${#fields.hasErrors('startTime')} ? 'is-invalid' : ''">
+                            <input type="datetime-local" th:field="*{startTime}" class="form-control" th:classappend="${#fields.hasErrors('startTime')} ? 'is-invalid' : ''">
                             <small class="text-muted">Thời gian phải lớn hơn hiện tại</small>
                             <div class="invalid-feedback" th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}"></div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Giá vé (VNĐ)</label>
-                            <input type="number" th:field="*{price}" class="form-control" min="0" required th:classappend="${#fields.hasErrors('price')} ? 'is-invalid' : ''">
+                            <input type="number" th:field="*{price}" class="form-control" min="0" th:classappend="${#fields.hasErrors('price')} ? 'is-invalid' : ''">
                             <div class="invalid-feedback" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
                         </div>
 

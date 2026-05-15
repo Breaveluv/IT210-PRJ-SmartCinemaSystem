@@ -2,6 +2,7 @@ package com.example.smartcinemabookingsystem.controller;
 
 import com.example.smartcinemabookingsystem.model.Room;
 import com.example.smartcinemabookingsystem.service.RoomService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,7 +29,7 @@ public class AdminRoomController {
     }
 
     @PostMapping("/save")
-    public String saveRoom(@jakarta.validation.Valid @ModelAttribute Room room, 
+    public String saveRoom(@Valid @ModelAttribute Room room,
                           org.springframework.validation.BindingResult bindingResult, 
                           org.springframework.ui.Model model,
                           RedirectAttributes redirectAttributes) {

@@ -50,7 +50,7 @@ public class AuthController {
             session.setAttribute("loggedInUser", loggedInUser);
             
             if (loggedInUser.getRole() == User.Role.ADMIN) {
-                return "redirect:/admin/dashboard"; // Redirect Admin to admin dashboard
+                return "redirect:/admin/movies"; // Redirect Admin to admin dashboard
             } else {
                 return "redirect:/"; // Redirect other users to home page
             }

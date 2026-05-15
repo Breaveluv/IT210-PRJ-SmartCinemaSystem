@@ -43,7 +43,7 @@ public class AdminMovieController {
                             Model model,
                             RedirectAttributes redirectAttributes) {
 
-        // Sync genres from genreIds to the movie object to preserve selection on error
+        // "Đồng bộ hóa thể loại từ danh sách genreIds vào đối tượng movie để giữ lại các lựa chọn cũ khi xảy ra lỗi.
         if (genreIds != null && !genreIds.isEmpty()) {
             java.util.Set<com.example.smartcinemabookingsystem.model.Genre> genres = genreIds.stream()
                     .map(id -> genreService.getGenreById(id).orElse(null))
@@ -89,7 +89,7 @@ public class AdminMovieController {
             movieService.deleteMovie(id);
             redirectAttributes.addFlashAttribute("successMessage", "Phim đã được xóa thành công!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi xóa phim: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi xóa phim đang được chiếu " );
         }
         return "redirect:/admin/movies";
     }

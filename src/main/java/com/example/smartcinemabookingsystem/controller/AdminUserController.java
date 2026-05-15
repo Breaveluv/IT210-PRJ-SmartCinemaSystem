@@ -31,7 +31,7 @@ public class AdminUserController {
     @PostMapping("/save")
     public String saveUser(@jakarta.validation.Valid @ModelAttribute User user, 
                           org.springframework.validation.BindingResult bindingResult, 
-                          org.springframework.ui.Model model,
+                           org.springframework.ui.Model model,
                           RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("roles", User.Role.values());

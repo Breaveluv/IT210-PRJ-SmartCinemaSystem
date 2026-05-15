@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,10 +19,10 @@ public class MovieService {
     private final MovieRepository movieRepository;
 
     public List<Movie> getAllMovies() {
-        return movieRepository.findAll();
+        return movieRepository.findAll(Sort.by(Sort.Direction.ASC, "duration"));
     }
 
-    // Changed return type to Optional<Movie>
+    // đổi kiểu trả về thành Optional<Movie>
     public Optional<Movie> getMovieById(Long id) {
         return movieRepository.findById(id);
     }

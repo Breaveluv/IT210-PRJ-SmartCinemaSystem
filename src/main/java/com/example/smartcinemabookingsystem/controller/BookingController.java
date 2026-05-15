@@ -93,7 +93,7 @@ public class BookingController {
     @GetMapping("/success")
     public String bookingSuccess(Model model) {
         if (!model.containsAttribute("booking")) {
-            return "redirect:/"; // Redirect if no booking object is present (e.g., direct access)
+            return "redirect:/";
         }
         return "booking/success";
     }
